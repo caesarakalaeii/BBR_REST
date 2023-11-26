@@ -28,6 +28,33 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         Program.Logger.Info($"Command recieved: {restEvent}");
         switch (restEvent.EventType)
         {
+            case "AddBroadcaster":
+                BroadcasterList.Add(restEvent.SteamId, new Broadcaster(restEvent.SteamId));
+                player = AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
+                BroadcasterList[restEvent.SteamId].Player = player;
+                WriteSteamIds();
+                return;
+            case "RemoveBroadcaster":
+                BroadcasterList.Remove(restEvent.SteamId);
+                player = AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
+                if (player != null) player.IsBroadcaster = false;
+                WriteSteamIds();
+                return;
+        }
+
+        if (!BroadcasterList.Keys.Contains(restEvent.SteamId))
+        {
+            Program.Logger.Warn($"Broadcaster with ID {restEvent.SteamId} not known");
+            return;
+        }
+        if(BroadcasterList[restEvent.SteamId].Player == null)
+        {
+            Program.Logger.Warn($"Broadcaster with ID {restEvent.SteamId} not online");
+            return;
+        }
+        switch (restEvent.EventType)
+        {
+
             case "Follow":
                 
                 break;
@@ -52,26 +79,24 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 {
                     case "heal":
                         BroadcasterList[restEvent.SteamId].Player?.Heal(100);
+                        foreach (var p in AllPlayers)
+                        {
+                            p.Message($"{BroadcasterList[restEvent.SteamId].Player?.Name} just got healed by {restEvent.Username}! How lucky!");
+                        }
+                        Program.Logger.Info($"Healed {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
                         break;
                     case "kill":
                         BroadcasterList[restEvent.SteamId].Player?.Kill();
+                        foreach (var p in AllPlayers)
+                        {
+                            p.Message($"{BroadcasterList[restEvent.SteamId].Player?.Name} just got killed by {restEvent.Username}! How unfortunate!");
+                        }
                         break;
                         
                 }
 
                 break;
-            case "AddBroadcaster":
-                BroadcasterList.Add(restEvent.SteamId, new Broadcaster(restEvent.SteamId));
-                player = AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
-                BroadcasterList[restEvent.SteamId].Player = player;
-                WriteSteamIds();
-                break;
-            case "RemoveBroadcaster":
-                BroadcasterList.Remove(restEvent.SteamId);
-                player = AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
-                if (player != null) player.IsBroadcaster = false;
-                WriteSteamIds();
-                break;
+            
             
                 
         }
@@ -90,6 +115,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         
         string json = JsonConvert.SerializeObject(ulongList, Formatting.Indented);
         System.IO.File.WriteAllText("data/broadcasters.json", json);
+        Program.Logger.Info("Saved Broadcasters");
     }
 
     public void LoadSteamIds()
@@ -110,6 +136,8 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         {
             BroadcasterList.Add(steamId, (new Broadcaster(steamId)));
         }
+        
+        Program.Logger.Info("Loaded Broadcasters");
     }
 
 
