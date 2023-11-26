@@ -28,8 +28,8 @@ public class RestEvent
                 case "TwitchLogin":
                     TwitchLogin = data[1];
                     break;
-                case "RedeemStr":
-                    RedeemStr = data[1];
+                case "RedeemType":
+                    RedeemType = data[1];
                     break;
                 case "SteamId":
                     SteamId = ulong.Parse(data[1]);
@@ -67,7 +67,7 @@ public class RestEvent
     
     public string? TwitchLogin { get; set; }
     
-    public string? RedeemStr { get; set; }
+    public string? RedeemType { get; set; }
 
     public ulong SteamId { get; set; }
 
@@ -87,7 +87,7 @@ public class RestEvent
 
     public override string ToString()
     {
-        return $"EventType: {EventType}, Referral: {Referral}, TwitchId: {TwitchId}, TwitchLogin: {TwitchLogin}, RedeemStr: {RedeemStr}, SteamId: {SteamId}, Amount: {Amount}, Tier: {Tier}, Username: {Username}, TotalTime: {TotalTime}, Streak: {Streak}, GifterName: {GifterName}";
+        return $"EventType: {EventType}, Referral: {Referral}, TwitchId: {TwitchId}, TwitchLogin: {TwitchLogin}, RedeemStr: {RedeemType}, SteamId: {SteamId}, Amount: {Amount}, Tier: {Tier}, Username: {Username}, TotalTime: {TotalTime}, Streak: {Streak}, GifterName: {GifterName}";
     }
     
 }

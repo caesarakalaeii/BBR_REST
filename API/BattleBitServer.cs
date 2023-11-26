@@ -45,7 +45,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 
                 break;
             case "Redeem":
-                switch (restEvent.RedeemStr)
+                switch (restEvent.RedeemType)
                 {
                     case "heal":
                         BroadcasterList[restEvent.SteamId].Player?.Heal(100);
