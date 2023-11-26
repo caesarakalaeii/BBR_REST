@@ -95,7 +95,6 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     public void LoadSteamIds()
     {
         // Read the JSON from the file
-        string json = System.IO.File.ReadAllText("data/broadcasters.json");
         
         if (!File.Exists("data/broadcasters.json"))
         {
@@ -103,6 +102,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
             return;
         }
 
+        string json = System.IO.File.ReadAllText("data/broadcasters.json");
         // Deserialize the JSON to a list of ulong
         List<ulong> ulongList = JsonConvert.DeserializeObject<List<ulong>>(json);
 
