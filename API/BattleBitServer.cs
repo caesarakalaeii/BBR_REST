@@ -38,7 +38,6 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 
                 break;
             case "Raid":
-                ;
                 
                 break;
             case "Bits":
@@ -46,10 +45,17 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 
                 break;
             case "Redeem":
-                string redeemStr = restEvent.RedeemStr;
-                
-                
-                
+                switch (restEvent.RedeemStr)
+                {
+                    case "heal":
+                        BroadcasterList[restEvent.SteamId].Player?.Heal(100);
+                        break;
+                    case "kill":
+                        BroadcasterList[restEvent.SteamId].Player?.Kill();
+                        break;
+                        
+                }
+
                 break;
             case "AddBroadcaster":
                 BroadcasterList.Add(restEvent.SteamId, new Broadcaster(restEvent.SteamId));
