@@ -19,7 +19,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
 
     public void ConsumeCommand(RestEvent restEvent)
     {
-        int amount;
+        int? amount;
         string username;
         BattleBitPlayer? player;
         Program.Logger.Info($"Command recieved: {restEvent}");
