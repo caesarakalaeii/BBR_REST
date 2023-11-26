@@ -9,7 +9,7 @@ public class SetGmCommand: InGameCommand
     
     public SetGmCommand(BattleBitServer r) : base(r)
     {
-     CommandString = "nextGM";
+     CommandString = "setGM";
      Description = "Selects the next Gamemode in Playlist and resets all Players";
      Permission = 25;
      NeedsUserInput = true;

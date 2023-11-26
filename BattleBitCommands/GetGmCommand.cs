@@ -6,7 +6,7 @@ public class GetGmCommand: InGameCommand
 {
     public GetGmCommand(BattleBitServer r) : base(r)
     {
-        CommandString = "GetGM";
+        CommandString = "getGM";
         Description = "Announces the current selected GameMode";
         Permission = 0;
     }
