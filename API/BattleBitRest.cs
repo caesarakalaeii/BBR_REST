@@ -51,10 +51,10 @@ public class BattleBitRest : ControllerBase
                     {
                         // Read the JSON data from the request body
                         string json = reader.ReadToEnd();
-                        var jsonDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                        RestEvent restEvent = JsonConvert.DeserializeObject<RestEvent>(json);
                         // You can now parse the JSON data or perform any desired operations
                         // For simplicity, let's just return the received JSON data as a response
-                        Program.Server.ConsumeCommand(jsonDictionary);
+                        Program.Server.ConsumeCommand(restEvent);
                     }
                 }
             }

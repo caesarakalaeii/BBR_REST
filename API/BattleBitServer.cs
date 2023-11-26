@@ -17,14 +17,13 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     
     
 
-    public void ConsumeCommand(Dictionary<string, string> command)
+    public void ConsumeCommand(RestEvent restEvent)
     {
         int amount;
         string username;
         BattleBitPlayer? player;
-        ulong steamId = ulong.Parse(command["SteamId"]);
-        Program.Logger.Info($"Command recieved: {command}");
-        switch (command["EventType"])
+        Program.Logger.Info($"Command recieved: {restEvent}");
+        switch (restEvent.EventType)
         {
             case "Follow":
                 
@@ -39,27 +38,27 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 
                 break;
             case "Raid":
-                amount = int.Parse(command["Amount"]);
+                ;
                 
                 break;
             case "Bits":
-                amount = int.Parse(command["Amount"]);
+                amount = restEvent.Amount;
                 
                 break;
             case "Redeem":
-                string redeemStr = command["RedeemStr"];
+                string redeemStr = restEvent.RedeemStr;
                 
                 
                 
                 break;
             case "AddBroadcaster":
-                BroadcasterList.Add(steamId, new Broadcaster(steamId));
-                player = AllPlayers.FirstOrDefault(p => p.SteamID == steamId);
-                BroadcasterList[steamId].Player = player;
+                BroadcasterList.Add(restEvent.SteamId, new Broadcaster(restEvent.SteamId));
+                player = AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
+                BroadcasterList[restEvent.SteamId].Player = player;
                 break;
             case "RemoveBroadcaster":
-                BroadcasterList.Remove(steamId);
-                player = AllPlayers.FirstOrDefault(p => p.SteamID == steamId);
+                BroadcasterList.Remove(restEvent.SteamId);
+                player = AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
                 if (player != null) player.IsBroadcaster = false;
                 break;
             
