@@ -30,6 +30,11 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         switch (restEvent.EventType)
         {
             case "AddBroadcaster":
+                if (BroadcasterList.Keys.Contains(restEvent.SteamId))
+                {
+                    Program.Logger.Info($"Broadcaster with Id, is already known :)");
+                    return;
+                }
                 BroadcasterList.Add(restEvent.SteamId, new Broadcaster(restEvent.SteamId));
                 player = AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
                 BroadcasterList[restEvent.SteamId].Player = player;
