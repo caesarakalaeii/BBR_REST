@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BattleBitAPI.Common;
@@ -80,6 +81,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     
     public void WriteSteamIds()
     {
+        Directory.CreateDirectory(Path.GetDirectoryName("data/broadcasters.json") ?? string.Empty);
         List<ulong> ulongList = new List<ulong>();
         foreach (var broadcaster in BroadcasterList)
         {
@@ -94,6 +96,12 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     {
         // Read the JSON from the file
         string json = System.IO.File.ReadAllText("data/broadcasters.json");
+        
+        if (!File.Exists("data/broadcasters.json"))
+        {
+            Program.Logger.Warn("No Broadcasters to load");
+            return;
+        }
 
         // Deserialize the JSON to a list of ulong
         List<ulong> ulongList = JsonConvert.DeserializeObject<List<ulong>>(json);
