@@ -12,6 +12,7 @@ public class RestEvent
         string[] entries = jsonString.Replace("{", "") // remove unneccesary chars and split
                                         .Replace("}", "")
                                         .Replace("\"", "")
+                                        .Replace("\\", "")
                                         .Split(", ");
         foreach (var entry in entries)
         {
