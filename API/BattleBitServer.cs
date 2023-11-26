@@ -103,7 +103,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                     case "swap":
 
                         BattleBitPlayer? selectedPlayer = BroadcasterList[restEvent.SteamId].Player;
-                        while (selectedPlayer == BroadcasterList[restEvent.SteamId].Player)
+                        while (selectedPlayer == BroadcasterList[restEvent.SteamId].Player && AllPlayers.Count() > 1)
                         {
                             selectedPlayer = GetRandom<BattleBitPlayer>(AllPlayers);
                         }
