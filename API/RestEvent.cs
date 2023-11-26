@@ -4,27 +4,88 @@ namespace ChaosMode.API;
 
 public class RestEvent
 {
-    [JsonProperty("Referral")]
+    
+    // "{"Referral": "String", "TwitchId": "Integer", "TwitchLogin": "String", "SteamId": "ulong", "EventType": "String"}"
+
+    public RestEvent(string jsonString)
+    {
+        string[] entries = jsonString.Replace("{", "") // remove unneccesary chars and split
+                                        .Replace("}", "")
+                                        .Replace("\"", "")
+                                        .Split(", ");
+        foreach (var entry in entries)
+        {
+            string[] data = entry.Split(": ");
+            switch (data[0])
+            {
+                case "Referral":
+                    Referral = data[1];
+                    break;
+                case "TwitchId":
+                    TwitchId = int.Parse(data[1]);
+                    break;
+                case "TwitchLogin":
+                    TwitchLogin = data[1];
+                    break;
+                case "RedeemStr":
+                    RedeemStr = data[1];
+                    break;
+                case "SteamId":
+                    SteamId = ulong.Parse(data[1]);
+                    break;
+                case "EventType":
+                    EventType = data[1];
+                    break;
+                case "Amount":
+                    Amount = int.Parse(data[1]);
+                    break;
+                case "Tier":
+                    Tier = int.Parse(data[1]);
+                    break;
+                case "Username":
+                    Username = data[1];
+                    break;
+                case "TotalTime":
+                    TotalTime = int.Parse(data[1]);
+                    break;
+                case "Streak":
+                    Streak = int.Parse(data[1]);
+                    break;
+                case "GifterName":
+                    GifterName = data[1];
+                    break;
+            }
+        }
+    }
+    
     public string? Referral { get; set; }
 
-    [JsonProperty("TwitchId")]
+    
     public int? TwitchId { get; set; }
 
-    [JsonProperty("TwitchLogin")]
+    
     public string? TwitchLogin { get; set; }
     
-    [JsonProperty("RedeemStr")]
     public string? RedeemStr { get; set; }
 
-    [JsonProperty("SteamId")]
     public ulong SteamId { get; set; }
 
-    [JsonProperty("EventType")]
     public string EventType { get; set; }
     
-    [JsonProperty("Amount")]
     public int? Amount { get; set; }
-    [JsonProperty("Tier")]
+    
     public int? Tier { get; set; }
+    
+    public string? Username { get; set; }
+    
+    public int? TotalTime { get; set; }
+    
+    public int? Streak { get; set; }
+    
+    public string? GifterName { get; set; }
+    
+    
+    
+    
 
 }

@@ -50,10 +50,11 @@ public class BattleBitRest : ControllerBase
                     using (StreamReader reader = new StreamReader(body, request.ContentEncoding))
                     {
                         // Read the JSON data from the request body
+                        
                         string json = reader.ReadToEnd();
-                        RestEvent restEvent = JsonConvert.DeserializeObject<RestEvent>(json);
-                        // You can now parse the JSON data or perform any desired operations
-                        // For simplicity, let's just return the received JSON data as a response
+                        Program.Logger.Info($"Json data recieved: {json}");
+                        RestEvent restEvent = new(json);
+                        
                         Program.Server.ConsumeCommand(restEvent);
                     }
                 }
