@@ -278,6 +278,11 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         {
             BroadcasterList[player.SteamID].Player = player;
         }
+
+        if (!Permissions.Keys.Contains(player.SteamID))
+        {
+            Permissions[player.SteamID] = 0;
+        }
         
         this.SayToAllChat("<color=green>" + player.Name + " joined the game!</color>");
         player.Message($"Current GameMode is: {CurrentGameMode.Name}", 4f);
