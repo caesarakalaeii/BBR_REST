@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BattleBitAPI.Common;
+using BattleBitAPI.Pooling;
 using BattleBitAPI.Server;
 using ChaosMode.BattleBitCommands;
+using Newtonsoft.Json;
 
 namespace ChaosMode.API;
 
@@ -61,17 +63,45 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 BroadcasterList.Add(restEvent.SteamId, new Broadcaster(restEvent.SteamId));
                 player = AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
                 BroadcasterList[restEvent.SteamId].Player = player;
+                WriteSteamIds();
                 break;
             case "RemoveBroadcaster":
                 BroadcasterList.Remove(restEvent.SteamId);
                 player = AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
                 if (player != null) player.IsBroadcaster = false;
+                WriteSteamIds();
                 break;
             
                 
         }
 
         
+    }
+    
+    public void WriteSteamIds()
+    {
+        List<ulong> ulongList = new List<ulong>();
+        foreach (var broadcaster in BroadcasterList)
+        {
+            ulongList.Add(broadcaster.Key);
+        }
+        
+        string json = JsonConvert.SerializeObject(ulongList, Formatting.Indented);
+        System.IO.File.WriteAllText("data/broadcasters.json", json);
+    }
+
+    public void LoadSteamIds()
+    {
+        // Read the JSON from the file
+        string json = System.IO.File.ReadAllText("data/broadcasters.json");
+
+        // Deserialize the JSON to a list of ulong
+        List<ulong> ulongList = JsonConvert.DeserializeObject<List<ulong>>(json);
+
+        foreach (var steamId in ulongList)
+        {
+            BroadcasterList.Add(steamId, (new Broadcaster(steamId)));
+        }
     }
 
 
@@ -109,6 +139,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         Permissions.Add(76561198053896127, 50); // Add Admin perms for caesar
         GameModeIndex = 0;
         CurrentGameMode = GameModes[GameModeIndex];
+        LoadSteamIds();
     }
 
 

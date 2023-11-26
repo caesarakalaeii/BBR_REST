@@ -54,8 +54,15 @@ public class BattleBitRest : ControllerBase
                         string json = reader.ReadToEnd();
                         Program.Logger.Info($"Json data recieved: {json}");
                         RestEvent restEvent = new(json);
-                        
-                        Program.Server.ConsumeCommand(restEvent);
+
+                        try
+                        {
+                            Program.Server.ConsumeCommand(restEvent);
+                        }
+                        catch (KeyNotFoundException e)
+                        {
+                            Program.Logger.Warn("Broadcaster not in List");
+                        }
                     }
                 }
             }
