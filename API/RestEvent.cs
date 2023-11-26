@@ -83,9 +83,10 @@ public class RestEvent
     public int? Streak { get; set; }
     
     public string? GifterName { get; set; }
-    
-    
-    
-    
 
+    public override string ToString()
+    {
+        return $"EventType: {EventType}, Referral: {Referral}, TwitchId: {TwitchId}, TwitchLogin: {TwitchLogin}, RedeemStr: {RedeemStr}, SteamId: {SteamId}, Amount: {Amount}, Tier: {Tier}, Username: {Username}, TotalTime: {TotalTime}, Streak: {Streak}, GifterName: {GifterName}";
+    }
+    
 }
