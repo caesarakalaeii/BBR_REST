@@ -5,16 +5,16 @@ namespace ChaosMode.API;
 public class RestEvent
 {
     [JsonProperty("Referral")]
-    public string Referral { get; set; }
+    public string? Referral { get; set; }
 
     [JsonProperty("TwitchId")]
-    public int TwitchId { get; set; }
+    public int? TwitchId { get; set; }
 
     [JsonProperty("TwitchLogin")]
-    public string TwitchLogin { get; set; }
+    public string? TwitchLogin { get; set; }
     
     [JsonProperty("RedeemStr")]
-    public string RedeemStr { get; set; }
+    public string? RedeemStr { get; set; }
 
     [JsonProperty("SteamId")]
     public ulong SteamId { get; set; }
@@ -23,8 +23,8 @@ public class RestEvent
     public string EventType { get; set; }
     
     [JsonProperty("Amount")]
-    public int Amount { get; set; }
+    public int? Amount { get; set; }
     [JsonProperty("Tier")]
-    public int Tier { get; set; }
+    public int? Tier { get; set; }
 
 }
