@@ -14,7 +14,7 @@ public class BattleBitRest : ControllerBase
     private string _urlString;
     public BattleBitRest(string ip, int port)
     {
-        _urlString = $"http://127.0.0.1:{port}/";
+        _urlString = $"http://*:{port}/";
     }
     
     

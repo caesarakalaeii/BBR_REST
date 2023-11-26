@@ -49,6 +49,8 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
             case "Redeem":
                 string redeemStr = command["RedeemStr"];
                 
+                
+                
                 break;
             case "AddBroadcaster":
                 BroadcasterList.Add(steamId, new Broadcaster(steamId));
