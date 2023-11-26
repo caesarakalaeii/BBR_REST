@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using BattleBitAPI.Common;
 using BattleBitAPI.Pooling;
@@ -75,6 +76,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 
                 break;
             case "Redeem":
+                BattleBitPlayer? battleBitPlayer;
                 switch (restEvent.RedeemType)
                 {
                     case "heal":
@@ -91,7 +93,55 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                         {
                             p.Message($"{BroadcasterList[restEvent.SteamId].Player?.Name} just got killed by {restEvent.Username}! How unfortunate!");
                         }
+                        Program.Logger.Info($"Killed {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
                         break;
+                    case "swap":
+
+                        BattleBitPlayer? selectedPlayer = BroadcasterList[restEvent.SteamId].Player;
+                        while (selectedPlayer == BroadcasterList[restEvent.SteamId].Player)
+                        {
+                            selectedPlayer = GetRandom<BattleBitPlayer>(AllPlayers);
+                        }
+
+                        if (selectedPlayer != null)
+                        {
+                            battleBitPlayer = BroadcasterList[restEvent.SteamId].Player;
+                            if (battleBitPlayer != null)
+                                swapPlayers(battleBitPlayer, selectedPlayer);
+                        }
+                        Program.Logger.Info($"Swapped {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId}) with {selectedPlayer.Name}({selectedPlayer.SteamID})");
+                        foreach (var p in AllPlayers)
+                        {
+                            p.Message($"Swapped {BroadcasterList[restEvent.SteamId].Player?.Name} with {selectedPlayer.Name}! OwO How exiting!");
+                        }
+                        break;
+                    case "reveal":
+                        battleBitPlayer = BroadcasterList[restEvent.SteamId].Player;
+                        if (battleBitPlayer != null)
+                        {
+                            battleBitPlayer.Modifications.IsExposedOnMap = true;
+                            foreach (var p in AllPlayers)
+                            {
+                                p.Message(
+                                    $"{battleBitPlayer?.Name} is now revealed thanks to {restEvent.Username}! Be careful!");
+                            }
+
+                            Program.Logger.Info(
+                                $"Revealed {battleBitPlayer?.Name}({restEvent.SteamId})");
+                            Task.Run(() =>
+                            {
+                                Task.Delay(60000);
+                                if (battleBitPlayer != null)
+                                {
+                                    battleBitPlayer.Modifications.IsExposedOnMap = false;
+                                }
+
+                            });
+                        }
+
+                        break;
+                        
+                        
                         
                 }
 
@@ -102,6 +152,22 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         }
 
         
+    }
+
+    public void swapPlayers(BattleBitPlayer player1, BattleBitPlayer player2)
+    {
+        Vector3 pos1 = player1.Position;
+        Vector3 pos2 = player2.Position;
+        player1.Teleport(pos2);
+        player2.Teleport(pos1);
+    }
+    
+    
+    static T GetRandom<T>(IEnumerable<T> enumerable)
+    {
+        Random random = new Random();
+        int randomIndex = random.Next(0, enumerable.Count());
+        return enumerable.ElementAt(randomIndex);
     }
     
     public void WriteSteamIds()
