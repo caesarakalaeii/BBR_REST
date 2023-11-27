@@ -125,7 +125,7 @@ internal class Program
 
         try
         {
-            Logger = LogManager.GetLogger("Lifesteal");
+            Logger = LogManager.GetLogger("ChaosMode");
             Logger.Info("Logger initialized.");
         }
         catch (Exception ex)

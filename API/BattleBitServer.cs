@@ -19,6 +19,8 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     public Dictionary<ulong, Broadcaster> BroadcasterList = new();
 
     public Dictionary<ulong, int> Permissions = new();
+
+    public RedeemHandler RHandler = new RedeemHandler();
     
     
 
@@ -182,7 +184,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
 
                             Program.Logger.Info(
                                 $"Revealed {battleBitPlayer?.Name}({restEvent.SteamId})");
-                            Task.Run(async () =>
+                            RHandler.Enqueue((RedeemTypes)restEvent.RedeemType, async () =>
                             {
                                 await Task.Delay(60000);
                                 if (battleBitPlayer != null)
@@ -208,7 +210,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                     $"{battleBitPlayer?.Name} has the zoomies thanks to {restEvent.Username}!", 2);
                             }
                             
-                            Task.Run(async () =>
+                            RHandler.Enqueue((RedeemTypes)restEvent.RedeemType, async () =>
                             {
                                 await Task.Delay(60000);
 
@@ -236,7 +238,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                             }
                             Program.Logger.Info(
                                 $"Glass mode for {battleBitPlayer?.Name}({restEvent.SteamId})");
-                            Task.Run(async () =>
+                            RHandler.Enqueue((RedeemTypes)restEvent.RedeemType, async () =>
                             {
                                 await Task.Delay(30000);
 
@@ -266,7 +268,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                             }
                             Program.Logger.Info(
                                 $"Froze {battleBitPlayer?.Name}({restEvent.SteamId})");
-                            Task.Run(async () =>
+                            RHandler.Enqueue((RedeemTypes)restEvent.RedeemType, async () =>
                             {
                                 Program.Logger.Info(
                                     $"we wait");
@@ -282,7 +284,6 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                 }
                             });
                         }
-                        
                         break;
                     case RedeemTypes.BLEED:
                         // set bleeding to enabled and revert after 1 min
@@ -298,7 +299,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                 p.Message(
                                     $"{battleBitPlayer?.Name} is now bleeding, thanks to {restEvent.Username}!", 2);
                             }
-                            Task.Run(async () =>
+                            RHandler.Enqueue((RedeemTypes)restEvent.RedeemType, async () =>
                             {
                                 await Task.Delay(60000);
 
@@ -549,6 +550,36 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     }
 }
 
+public class RedeemHandler
+{
+    private Dictionary<RedeemTypes, Queue<Func<Task>>> RedeemQueues = new(); 
+    private readonly Array _availableRedeems = Enum.GetValues(typeof(RedeemTypes));
+    public RedeemHandler()
+    {
+        //build necessary queues
+        
+        foreach (var enumValue in _availableRedeems)
+        {
+            RedeemQueues[(RedeemTypes)enumValue] = new Queue<Func<Task>>();
+        }
+    }
+
+    public async void Run(RedeemTypes redeemType)
+    {
+        while (true)
+        {
+            Func<Task> func = RedeemQueues[redeemType].Dequeue();
+            await Task.Run(func);
+        }
+    }
+
+    public void Enqueue(RedeemTypes redeemType, Func<Task> func)
+    {
+        
+        RedeemQueues[redeemType].Enqueue(func);
+    }
+    
+}
 public enum RedeemTypes
 {
 
