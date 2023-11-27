@@ -234,6 +234,8 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                 p.Message(
                                     $"{battleBitPlayer?.Name} is now made of glass, thanks to {restEvent.Username}!", 2);
                             }
+                            Program.Logger.Info(
+                                $"Glass mode for {battleBitPlayer?.Name}({restEvent.SteamId})");
                             Task.Run(() =>
                             {
                                 Task.Delay(30000);
@@ -244,11 +246,12 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                     battleBitPlayer.Modifications.FallDamageMultiplier = oldFallDMG;
                                     battleBitPlayer.Modifications.ReceiveDamageMultiplier = oldRecieveDMG;
                                 }
+                                Program.Logger.Info(
+                                    $"Glass mode off for {battleBitPlayer?.Name}({restEvent.SteamId})");
                             });
                         }
                         
-                        Program.Logger.Info(
-                            $"Glass mode for {battleBitPlayer?.Name}({restEvent.SteamId})");
+                        
                         break;
                     case RedeemTypes.FREEZE:
                         //freeze player for 10 secs
@@ -261,20 +264,22 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                 p.Message(
                                     $"{battleBitPlayer?.Name} is now frozen, thanks to {restEvent.Username}!", 2);
                             }
+                            Program.Logger.Info(
+                                $"Froze {battleBitPlayer?.Name}({restEvent.SteamId})");
                             Task.Run(() =>
                             {
-                                Task.Delay(10000);
-
+                                Task.Delay(100000);
+    
                                 if (battleBitPlayer != null)
                                 {
                                 
                                     battleBitPlayer.Modifications.Freeze = false;
                                 }
+                                Program.Logger.Info(
+                                    $"Unfroze {battleBitPlayer?.Name}({restEvent.SteamId})");
                             });
                         }
                         
-                        Program.Logger.Info(
-                            $"Froze {battleBitPlayer?.Name}({restEvent.SteamId})");
                         break;
                     case RedeemTypes.BLEED:
                         // set bleeding to enabled and revert after 1 min
@@ -311,6 +316,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                         }
                         Program.Logger.Info($"Truntabled {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
                         break;
+                    
                     case RedeemTypes.MEELEE:
                         // set gadget to Pickaxe and clears previous Loadout
                         // Needs Queuing???
