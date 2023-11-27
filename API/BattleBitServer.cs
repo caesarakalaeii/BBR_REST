@@ -344,6 +344,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
 
                 if (!RHandler.IsRunning)
                 { // spawn new redeem queue instance if old one is not running
+                    Program.Logger.Info($"Spawning new Handler for {restEvent.RedeemType}");
                     Task.Run(() => { RHandler.Run(restEvent.RedeemType!); });
                 }
     }
@@ -578,6 +579,7 @@ public class RedeemHandler
             if (RedeemQueues[redeemType].Count == 0)
             {
                 IsRunning = false;
+                Program.Logger.Info($"Killing task for {redeemType}");
                 return;
             }
             Func<Task> func = RedeemQueues[redeemType].Dequeue();
