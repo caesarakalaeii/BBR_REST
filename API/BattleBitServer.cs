@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -23,13 +24,12 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
 
     public void ConsumeCommand(RestEvent restEvent)
     {
-        int? amount;
-        string username;
         BattleBitPlayer? player;
         Program.Logger.Info($"Command recieved: {restEvent}");
         switch (restEvent.EventType)
         {
             case "AddBroadcaster":
+                // add broadcaster to the list if it doesnt exist
                 if (BroadcasterList.Keys.Contains(restEvent.SteamId))
                 {
                     Program.Logger.Info($"Broadcaster with Id, is already known :)");
@@ -41,6 +41,12 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 WriteSteamIds();
                 return;
             case "RemoveBroadcaster":
+                // removes broadcaster to the list if it exists
+                if (!BroadcasterList.Keys.Contains(restEvent.SteamId))
+                {
+                    Program.Logger.Info($"Broadcaster with Id, is not known :)");
+                    return;
+                }
                 BroadcasterList.Remove(restEvent.SteamId);
                 player = AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
                 if (player != null) player.IsBroadcaster = false;
@@ -55,7 +61,8 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         }
         if(BroadcasterList[restEvent.SteamId].Player == null)
         {
-            foreach (var p in AllPlayers) // try to find the player
+            // if no player instance is known,  try to find the player and set a reference to use
+            foreach (var p in AllPlayers) 
             {
                 if (BroadcasterList.Keys.Contains(p.SteamID))
                 {
@@ -123,23 +130,26 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 switch (restEvent.RedeemType)
                 {
                     case RedeemTypes.HEAL:
+                        // full heals the player
                         BroadcasterList[restEvent.SteamId].Player?.Heal(100);
                         foreach (var p in AllPlayers)
                         {
-                            p.Message($"{BroadcasterList[restEvent.SteamId].Player?.Name} just got healed by {restEvent.Username}! How lucky!");
+                            p.Message($"{BroadcasterList[restEvent.SteamId].Player?.Name} just got healed by {restEvent.Username}! How lucky!", 2);
                         }
                         Program.Logger.Info($"Healed {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
                         break;
                     case RedeemTypes.KILL:
+                        // kills the player
                         BroadcasterList[restEvent.SteamId].Player?.Kill();
                         foreach (var p in AllPlayers)
                         {
-                            p.Message($"{BroadcasterList[restEvent.SteamId].Player?.Name} just got killed by {restEvent.Username}! How unfortunate!");
+                            p.Message($"{BroadcasterList[restEvent.SteamId].Player?.Name} just got killed by {restEvent.Username}! How unfortunate!", 2);
                         }
                         Program.Logger.Info($"Killed {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
                         break;
                     case RedeemTypes.SWAP:
-
+                        // switch player with random one (Wierd behavior if player is in save zone)
+                        
                         BattleBitPlayer? selectedPlayer = BroadcasterList[restEvent.SteamId].Player;
                         while (selectedPlayer == BroadcasterList[restEvent.SteamId].Player && AllPlayers.Count() > 1)
                         {
@@ -155,10 +165,11 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                         Program.Logger.Info($"Swapped {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId}) with {selectedPlayer.Name}({selectedPlayer.SteamID})");
                         foreach (var p in AllPlayers)
                         {
-                            p.Message($"Swapped {BroadcasterList[restEvent.SteamId].Player?.Name} with {selectedPlayer.Name}! OwO How exiting!");
+                            p.Message($"Swapped {BroadcasterList[restEvent.SteamId].Player?.Name} with {selectedPlayer.Name}! OwO How exiting!", 2);
                         }
                         break;
                     case RedeemTypes.REVEAL: // Apparently non functional TODO: debug this
+                        // show player on map for 1 min
                         battleBitPlayer = BroadcasterList[restEvent.SteamId].Player;
                         if (battleBitPlayer != null)
                         {
@@ -166,7 +177,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                             foreach (var p in AllPlayers)
                             {
                                 p.Message(
-                                    $"{battleBitPlayer?.Name} is now revealed thanks to {restEvent.Username}! Be careful!");
+                                    $"{battleBitPlayer?.Name} is now revealed thanks to {restEvent.Username}!", 2);
                             }
 
                             Program.Logger.Info(
@@ -183,15 +194,140 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                             });
                         }
                         break;
+                    case RedeemTypes.ZOOMIES:
+                        // sets speed to *3 for 1min
+                        battleBitPlayer = BroadcasterList[restEvent.SteamId].Player;
+                        if (battleBitPlayer != null)
+                        {
+                            var oldSpeed = battleBitPlayer.Modifications.RunningSpeedMultiplier;
+                            battleBitPlayer.Modifications.RunningSpeedMultiplier = oldSpeed * 3;
+                            
+                            foreach (var p in AllPlayers)
+                            {
+                                p.Message(
+                                    $"{battleBitPlayer?.Name} has the zoomies thanks to {restEvent.Username}!", 2);
+                            }
+                            
+                            Task.Run(() =>
+                            {
+                                Task.Delay(60000);
+
+                                if (battleBitPlayer != null)
+                                    battleBitPlayer.Modifications.RunningSpeedMultiplier = oldSpeed;
+                            });
+                            
+                            Program.Logger.Info(
+                                $"Zoomies for {battleBitPlayer?.Name}({restEvent.SteamId})");
+                        }
+                        break;
+                    case RedeemTypes.GLASS:
+                        // make player very vulnerable, revert after 30secs
+                        battleBitPlayer = BroadcasterList[restEvent.SteamId].Player;
+                        if (battleBitPlayer != null)
+                        {
+                            var oldFallDMG = battleBitPlayer.Modifications.FallDamageMultiplier;
+                            var oldRecieveDMG = battleBitPlayer.Modifications.ReceiveDamageMultiplier;
+                            battleBitPlayer.Modifications.FallDamageMultiplier = 10;
+                            battleBitPlayer.Modifications.ReceiveDamageMultiplier = 10;
+                            foreach (var p in AllPlayers)
+                            {
+                                p.Message(
+                                    $"{battleBitPlayer?.Name} is now made of glass, thanks to {restEvent.Username}!", 2);
+                            }
+                            Task.Run(() =>
+                            {
+                                Task.Delay(30000);
+
+                                if (battleBitPlayer != null)
+                                {
+                                
+                                    battleBitPlayer.Modifications.FallDamageMultiplier = oldFallDMG;
+                                    battleBitPlayer.Modifications.ReceiveDamageMultiplier = oldRecieveDMG;
+                                }
+                            });
+                        }
+                        
+                        Program.Logger.Info(
+                            $"Glass mode for {battleBitPlayer?.Name}({restEvent.SteamId})");
+                        break;
+                    case RedeemTypes.FREEZE:
+                        //freeze player for 10 secs
+                        battleBitPlayer = BroadcasterList[restEvent.SteamId].Player;
+                        if (battleBitPlayer != null)
+                        {
+                            battleBitPlayer.Modifications.Freeze = true;
+                            foreach (var p in AllPlayers)
+                            {
+                                p.Message(
+                                    $"{battleBitPlayer?.Name} is now frozen, thanks to {restEvent.Username}!", 2);
+                            }
+                            Task.Run(() =>
+                            {
+                                Task.Delay(10000);
+
+                                if (battleBitPlayer != null)
+                                {
+                                
+                                    battleBitPlayer.Modifications.Freeze = false;
+                                }
+                            });
+                        }
+                        
+                        Program.Logger.Info(
+                            $"Froze {battleBitPlayer?.Name}({restEvent.SteamId})");
+                        break;
+                    case RedeemTypes.BLEED:
+                        // set bleeding to enabled and revert after 1 min
+                        
+                        battleBitPlayer = BroadcasterList[restEvent.SteamId].Player;
+                        if (battleBitPlayer != null)
+                        {
+                            var oldMinDmgBleed = battleBitPlayer.Modifications.MinimumDamageToStartBleeding;
+                            var oldMinHpBleed = battleBitPlayer.Modifications.MinimumHpToStartBleeding;
+                            battleBitPlayer.Modifications.EnableBleeding(0, 100);
+                            foreach (var p in AllPlayers)
+                            {
+                                p.Message(
+                                    $"{battleBitPlayer?.Name} is now bleeding, thanks to {restEvent.Username}!", 2);
+                            }
+                            Task.Run(() =>
+                            {
+                                Task.Delay(60000);
+
+                                battleBitPlayer?.Modifications.EnableBleeding(oldMinHpBleed, oldMinDmgBleed);
+                            });
+                        }
+                        
+                        Program.Logger.Info(
+                            $"Bleed {battleBitPlayer?.Name}({restEvent.SteamId})");
+                        break;
+                    case RedeemTypes.TRUNTABLES:
+                        // switches Team
+                        BroadcasterList[restEvent.SteamId].Player?.ChangeTeam();
+                        
+                        foreach (var p in AllPlayers)
+                        {
+                            p.Message($"{BroadcasterList[restEvent.SteamId].Player?.Name} just switched teams, by {restEvent.Username}! How the turntables!", 2);
+                        }
+                        Program.Logger.Info($"Truntabled {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
+                        break;
+                    case RedeemTypes.MEELEE:
+                        // set gadget to Pickaxe and clears previous Loadout
+                        // Needs Queuing???
+                        BroadcasterList[restEvent.SteamId].Player?.SetLightGadget("Pickaxe", 0, true);
+                        foreach (var p in AllPlayers)
+                        {
+                            p.Message($"{BroadcasterList[restEvent.SteamId].Player?.Name} just went commando thanks {restEvent.Username}! How the turntables!", 2);
+                        }
+                        Program.Logger.Info($"Meele Only {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
+                        break;
                     
-                    // TODO: More cases!!!!!!!!! 
+                        
+                    
                     // Enums are there, Twitch and BattleBit parts need to be added
-                    // zoomies via battleBitPlayer.Modifications.RunningSpeedMultiplier
-                    // glass mode via battleBitPlayer.Modifications.FallDamageMultiplier and battleBitPlayer.Modifications.ReceiveDamageMultiplier
-                    // freeze via battleBitPlayer.Modifications.Freeze
-                    // bleed mode? enableBleed and set min BleedDMG low
-                    // how the turntables: switch team
-                    // mellee only: switch loadout to sledge hammer
+                    
+                    // zoomies 4 all
+                    // ammo set ammo to 0?
                         
                         
                 }
