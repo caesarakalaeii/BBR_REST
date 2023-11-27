@@ -29,7 +29,7 @@ public class RestEvent
                     TwitchLogin = data[1];
                     break;
                 case "RedeemType":
-                    RedeemType = data[1];
+                    RedeemType = toRedeemType(data[1]);
                     break;
                 case "SteamId":
                     SteamId = ulong.Parse(data[1]);
@@ -58,6 +58,36 @@ public class RestEvent
             }
         }
     }
+
+    public RedeemTypes toRedeemType(string type)
+    {
+
+        switch (type)
+        {
+            case "heal":
+                return RedeemTypes.HEAL;
+            case "kill":
+                return RedeemTypes.KILL;
+            case "swap":
+                return RedeemTypes.SWAP;
+            case "reveal":
+                return RedeemTypes.REVEAL;
+            case "zoomies":
+                return RedeemTypes.ZOOMIES;
+            case "glass":
+                return RedeemTypes.GLASS;
+            case "freeze":
+                return RedeemTypes.FREEZE;
+            case "bleed":
+                return RedeemTypes.BLEED;
+            case "turntables":
+                return RedeemTypes.TRUNTABLES;
+            case "melee":
+                return RedeemTypes.MEELEE;
+            default:
+                return RedeemTypes.DEFAULT;
+        }
+    }
     
     public string? Referral { get; set; }
 
@@ -67,7 +97,7 @@ public class RestEvent
     
     public string? TwitchLogin { get; set; }
     
-    public string? RedeemType { get; set; }
+    public RedeemTypes? RedeemType { get; set; }
 
     public ulong SteamId { get; set; }
 

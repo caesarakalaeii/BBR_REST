@@ -55,36 +55,74 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         }
         if(BroadcasterList[restEvent.SteamId].Player == null)
         {
-            Program.Logger.Warn($"Broadcaster with ID {restEvent.SteamId} not online");
-            return;
+            foreach (var p in AllPlayers) // try to find the player
+            {
+                if (BroadcasterList.Keys.Contains(p.SteamID))
+                {
+                    BroadcasterList[p.SteamID].Player = p;
+                }
+            }
+
+            if (BroadcasterList[restEvent.SteamId].Player == null) // if player still not found return
+            {
+                Program.Logger.Warn($"Broadcaster with ID {restEvent.SteamId} not online");
+                return;
+            }
         }
         switch (restEvent.EventType)
         {
 
             case "Follow":
-                
+                RandomizeRedeem(restEvent);
                 break;
             case "Gift":
-                
+                RandomizeRedeem(restEvent);
+
                 break;
             case "Sub":
-                
+                RandomizeRedeem(restEvent);
+
                 break;
             case "SubBomb":
-                
+                RandomizeRedeem(restEvent);
+
                 break;
             case "Raid":
-                
+                RandomizeRedeem(restEvent);
+
                 break;
             case "Bits":
-                amount = restEvent.Amount;
-                
+                RandomizeRedeem(restEvent);
                 break;
             case "Redeem":
-                BattleBitPlayer? battleBitPlayer;
+                EventHandler(restEvent);
+                break;
+            
+            
+                
+        }
+
+        
+    }
+
+    public void RandomizeRedeem(RestEvent restEvent)
+    {
+        restEvent.RedeemType = RedeemTypes.DEFAULT;
+        while (restEvent.RedeemType == RedeemTypes.DEFAULT)
+        {
+            restEvent.RedeemType = GenerateRandomRedeem();
+        }
+        Program.Logger.Info($"Random redeem was chosen to be: {restEvent.RedeemType}");
+        EventHandler(restEvent);
+    }
+
+
+    public void EventHandler(RestEvent restEvent)
+    {
+        BattleBitPlayer? battleBitPlayer;
                 switch (restEvent.RedeemType)
                 {
-                    case "heal":
+                    case RedeemTypes.HEAL:
                         BroadcasterList[restEvent.SteamId].Player?.Heal(100);
                         foreach (var p in AllPlayers)
                         {
@@ -92,7 +130,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                         }
                         Program.Logger.Info($"Healed {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
                         break;
-                    case "kill":
+                    case RedeemTypes.KILL:
                         BroadcasterList[restEvent.SteamId].Player?.Kill();
                         foreach (var p in AllPlayers)
                         {
@@ -100,7 +138,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                         }
                         Program.Logger.Info($"Killed {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
                         break;
-                    case "swap":
+                    case RedeemTypes.SWAP:
 
                         BattleBitPlayer? selectedPlayer = BroadcasterList[restEvent.SteamId].Player;
                         while (selectedPlayer == BroadcasterList[restEvent.SteamId].Player && AllPlayers.Count() > 1)
@@ -120,7 +158,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                             p.Message($"Swapped {BroadcasterList[restEvent.SteamId].Player?.Name} with {selectedPlayer.Name}! OwO How exiting!");
                         }
                         break;
-                    case "reveal":
+                    case RedeemTypes.REVEAL: // Apparently non functional TODO: debug this
                         battleBitPlayer = BroadcasterList[restEvent.SteamId].Player;
                         if (battleBitPlayer != null)
                         {
@@ -139,23 +177,31 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                 if (battleBitPlayer != null)
                                 {
                                     battleBitPlayer.Modifications.IsExposedOnMap = false;
+
                                 }
 
                             });
                         }
-
                         break;
-                        
+                    
+                    // TODO: More cases!!!!!!!!! 
+                    // Enums are there, Twitch and BattleBit parts need to be added
+                    // zoomies via battleBitPlayer.Modifications.RunningSpeedMultiplier
+                    // glass mode via battleBitPlayer.Modifications.FallDamageMultiplier and battleBitPlayer.Modifications.ReceiveDamageMultiplier
+                    // freeze via battleBitPlayer.Modifications.Freeze
+                    // bleed mode? enableBleed and set min BleedDMG low
+                    // how the turntables: switch team
+                    // mellee only: switch loadout to sledge hammer
                         
                         
                 }
+    }
 
-                break;
-            
-            
-                
-        }
-
+    public RedeemTypes GenerateRandomRedeem()
+    {
+        Array enumValues = Enum.GetValues(typeof(RedeemTypes));
+        Random random = new Random();
+        return (RedeemTypes)(enumValues.GetValue(random.Next(enumValues.Length)) ?? RedeemTypes.DEFAULT);
         
     }
 
@@ -276,7 +322,19 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         var ret = CurrentGameMode.OnPlayerGivenUp(player);
         return base.OnPlayerGivenUp(ret);
     }
-    
+
+    public override Task OnSessionChanged(long oldSessionID, long newSessionID)
+    {
+        foreach (var player in AllPlayers)
+        {
+            if (BroadcasterList.Keys.Contains(player.SteamID))
+            {
+                BroadcasterList[player.SteamID].Player = player;
+            }
+        }
+        return base.OnSessionChanged(oldSessionID, newSessionID);
+    }
+
     public override Task OnPlayerConnected(BattleBitPlayer player)
     {
         if (BroadcasterList.Keys.Contains(player.SteamID))
@@ -344,6 +402,23 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         }
         return base.OnPlayerTypedMessage(player, channel, msg);
     }
+}
+
+public enum RedeemTypes
+{
+
+    HEAL,
+    KILL,
+    SWAP,
+    REVEAL,
+    ZOOMIES,
+    GLASS,
+    FREEZE,
+    BLEED,
+    TRUNTABLES,
+    MEELEE, 
+    DEFAULT
+    
 }
 
 public class Returner

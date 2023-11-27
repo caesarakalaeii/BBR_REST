@@ -219,6 +219,7 @@ internal class Program
         await Task.Delay(1000);
         UnloadServer();
     }
+    
 
     private void StartCommandHandler()
     {
