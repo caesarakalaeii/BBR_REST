@@ -182,9 +182,9 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
 
                             Program.Logger.Info(
                                 $"Revealed {battleBitPlayer?.Name}({restEvent.SteamId})");
-                            Task.Run(() =>
+                            Task.Run(async () =>
                             {
-                                Task.Delay(60000);
+                                await Task.Delay(60000);
                                 if (battleBitPlayer != null)
                                 {
                                     battleBitPlayer.Modifications.IsExposedOnMap = false;
@@ -208,9 +208,9 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                     $"{battleBitPlayer?.Name} has the zoomies thanks to {restEvent.Username}!", 2);
                             }
                             
-                            Task.Run(() =>
+                            Task.Run(async () =>
                             {
-                                Task.Delay(60000);
+                                await Task.Delay(60000);
 
                                 if (battleBitPlayer != null)
                                     battleBitPlayer.Modifications.RunningSpeedMultiplier = oldSpeed;
@@ -236,9 +236,9 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                             }
                             Program.Logger.Info(
                                 $"Glass mode for {battleBitPlayer?.Name}({restEvent.SteamId})");
-                            Task.Run(() =>
+                            Task.Run(async () =>
                             {
-                                Task.Delay(30000);
+                                await Task.Delay(30000);
 
                                 if (battleBitPlayer != null)
                                 {
@@ -266,9 +266,9 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                             }
                             Program.Logger.Info(
                                 $"Froze {battleBitPlayer?.Name}({restEvent.SteamId})");
-                            Task.Run(() =>
+                            Task.Run(async () =>
                             {
-                                Task.Delay(100000);
+                                await Task.Delay(10000);
     
                                 if (battleBitPlayer != null)
                                 {
@@ -295,9 +295,9 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                 p.Message(
                                     $"{battleBitPlayer?.Name} is now bleeding, thanks to {restEvent.Username}!", 2);
                             }
-                            Task.Run(() =>
+                            Task.Run(async () =>
                             {
-                                Task.Delay(60000);
+                                await Task.Delay(60000);
 
                                 battleBitPlayer?.Modifications.EnableBleeding(oldMinHpBleed, oldMinDmgBleed);
                             });
