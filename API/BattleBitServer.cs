@@ -268,15 +268,18 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                 $"Froze {battleBitPlayer?.Name}({restEvent.SteamId})");
                             Task.Run(async () =>
                             {
+                                Program.Logger.Info(
+                                    $"we wait");
                                 await Task.Delay(10000);
-    
+                                Program.Logger.Info(
+                                    $"we waited");
                                 if (battleBitPlayer != null)
                                 {
                                 
                                     battleBitPlayer.Modifications.Freeze = false;
+                                    Program.Logger.Info(
+                                        $"Unfroze {battleBitPlayer?.Name}({restEvent.SteamId})");
                                 }
-                                Program.Logger.Info(
-                                    $"Unfroze {battleBitPlayer?.Name}({restEvent.SteamId})");
                             });
                         }
                         
