@@ -29,7 +29,7 @@ public class RestEvent
                     TwitchLogin = data[1];
                     break;
                 case "RedeemType":
-                    RedeemType = toRedeemType(data[1]);
+                    RedeemType = ToRedeemType(data[1]);
                     break;
                 case "SteamId":
                     SteamId = ulong.Parse(data[1]);
@@ -59,7 +59,7 @@ public class RestEvent
         }
     }
 
-    public RedeemTypes toRedeemType(string type)
+    public static RedeemTypes ToRedeemType(string type)
     {
 
         switch (type)
@@ -97,7 +97,7 @@ public class RestEvent
     
     public string? TwitchLogin { get; set; }
     
-    public RedeemTypes? RedeemType { get; set; }
+    public RedeemTypes RedeemType { get; set; }
 
     public ulong SteamId { get; set; }
 

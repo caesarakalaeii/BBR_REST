@@ -162,7 +162,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                         {
                             battleBitPlayer = BroadcasterList[restEvent.SteamId].Player;
                             if (battleBitPlayer != null)
-                                swapPlayers(battleBitPlayer, selectedPlayer);
+                                SwapPlayers(battleBitPlayer, selectedPlayer);
                         }
                         Program.Logger.Info($"Swapped {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId}) with {selectedPlayer.Name}({selectedPlayer.SteamID})");
                         foreach (var p in AllPlayers)
@@ -184,7 +184,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
 
                             Program.Logger.Info(
                                 $"Revealed {battleBitPlayer?.Name}({restEvent.SteamId})");
-                            RHandler.Enqueue((RedeemTypes)restEvent.RedeemType, async () =>
+                            RHandler.Enqueue(restEvent.RedeemType, async () =>
                             {
                                 await Task.Delay(60000);
                                 if (battleBitPlayer != null)
@@ -210,7 +210,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                                     $"{battleBitPlayer?.Name} has the zoomies thanks to {restEvent.Username}!", 2);
                             }
                             
-                            RHandler.Enqueue((RedeemTypes)restEvent.RedeemType, async () =>
+                            RHandler.Enqueue(restEvent.RedeemType, async () =>
                             {
                                 await Task.Delay(60000);
 
@@ -238,7 +238,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                             }
                             Program.Logger.Info(
                                 $"Glass mode for {battleBitPlayer?.Name}({restEvent.SteamId})");
-                            RHandler.Enqueue((RedeemTypes)restEvent.RedeemType, async () =>
+                            RHandler.Enqueue(restEvent.RedeemType, async () =>
                             {
                                 await Task.Delay(30000);
 
@@ -268,7 +268,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                             }
                             Program.Logger.Info(
                                 $"Froze {battleBitPlayer?.Name}({restEvent.SteamId})");
-                            RHandler.Enqueue((RedeemTypes)restEvent.RedeemType, async () =>
+                            RHandler.Enqueue(restEvent.RedeemType, async () =>
                             {
                                 Program.Logger.Info(
                                     $"we wait");
@@ -329,7 +329,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                         {
                             p.Message($"{BroadcasterList[restEvent.SteamId].Player?.Name} just went commando thanks {restEvent.Username}! How the turntables!", 2);
                         }
-                        Program.Logger.Info($"Meele Only {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
+                        Program.Logger.Info($"Melee Only {BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
                         break;
                     
                         
@@ -341,6 +341,11 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                         
                         
                 }
+
+                if (!RHandler.IsRunning)
+                { // spawn new redeem queue instance if old one is not running
+                    Task.Run(() => { RHandler.Run(restEvent.RedeemType!); });
+                }
     }
 
     public RedeemTypes GenerateRandomRedeem()
@@ -351,7 +356,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         
     }
 
-    public void swapPlayers(BattleBitPlayer player1, BattleBitPlayer player2)
+    public static void SwapPlayers(BattleBitPlayer player1, BattleBitPlayer player2)
     {
         Vector3 pos1 = player1.Position;
         Vector3 pos2 = player2.Position;
@@ -554,10 +559,11 @@ public class RedeemHandler
 {
     private Dictionary<RedeemTypes, Queue<Func<Task>>> RedeemQueues = new(); 
     private readonly Array _availableRedeems = Enum.GetValues(typeof(RedeemTypes));
+    public bool IsRunning;
     public RedeemHandler()
     {
         //build necessary queues
-        
+        IsRunning = false;
         foreach (var enumValue in _availableRedeems)
         {
             RedeemQueues[(RedeemTypes)enumValue] = new Queue<Func<Task>>();
@@ -566,8 +572,14 @@ public class RedeemHandler
 
     public async void Run(RedeemTypes redeemType)
     {
-        while (true)
+        IsRunning = true;
+        while (IsRunning)
         {
+            if (RedeemQueues[redeemType].Count == 0)
+            {
+                IsRunning = false;
+                return;
+            }
             Func<Task> func = RedeemQueues[redeemType].Dequeue();
             await Task.Run(func);
         }
