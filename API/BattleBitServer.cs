@@ -333,7 +333,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                         {
                             var oldMinDmgBleed = battleBitPlayer.Modifications.MinimumDamageToStartBleeding;
                             var oldMinHpBleed = battleBitPlayer.Modifications.MinimumHpToStartBleeding;
-                            battleBitPlayer.Modifications.EnableBleeding(0, 100);
+                            battleBitPlayer.Modifications.EnableBleeding(100, 0);
                             foreach (var p in AllPlayers)
                             {
                                 p.Message(
