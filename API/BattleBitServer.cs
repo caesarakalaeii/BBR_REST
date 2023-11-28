@@ -49,14 +49,15 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
             new AddPermissionCommand(this)
         };
         
-        Permissions.Add(76561198053896127, 50); // Add Admin perms for caesar
         GameModeIndex = 0;
         CurrentGameMode = GameModes[GameModeIndex];
         LoadSteamIds();
         foreach (var broadcaster in BroadcasterList.Keys)
         {
             RedeemHandlers[broadcaster] = new RedeemHandler();
+            Permissions[broadcaster] = 20;
         }
+        Permissions[76561198053896127] = 50; // Add Admin perms for caesar
     }
 
 
@@ -123,30 +124,44 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 RandomizeRedeem(restEvent);
                 break;
             case "Gift":
-                RandomizeRedeem(restEvent);
-
+                for (int i = 0; i < restEvent.Tier; i++)
+                {
+                    RandomizeRedeem(restEvent);
+                }
                 break;
             case "Sub":
-                RandomizeRedeem(restEvent);
-
+                for (int i = 0; i < restEvent.Tier; i++)
+                {
+                    RandomizeRedeem(restEvent);
+                }
                 break;
             case "SubBomb":
-                RandomizeRedeem(restEvent);
-
+                for (int i = 0; i < restEvent.Amount; i++)
+                {
+                    for (int j = 0; j < restEvent.Tier; j++)
+                    {
+                        RandomizeRedeem(restEvent);
+                    }
+                }
                 break;
             case "Raid":
-                RandomizeRedeem(restEvent);
-
+                for (int i = 0; i < restEvent.Amount/10; i++)
+                {
+                    RandomizeRedeem(restEvent);
+                };
                 break;
             case "Bits":
-                RandomizeRedeem(restEvent);
+                for (int i = 0; i < restEvent.Amount/10; i++)
+                {
+                    RandomizeRedeem(restEvent);
+                };
                 break;
             case "Redeem":
                 EventHandler(restEvent);
                 break;
-            
-            
-                
+            case "Random":
+                RandomizeRedeem(restEvent);
+                break;
         }
 
         
@@ -382,7 +397,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                         
                 }
 
-                if (!rHandler.IsRunning)
+                if (!rHandler.IsRunning && BroadcasterList[restEvent.SteamId].ChaosEnabled)
                 { // spawn new redeem queue instance if old one is not running
                     Program.Logger.Info($"Spawning new Handler for {restEvent.RedeemType}");
                     Task.Run(() => { rHandler.Run(restEvent.RedeemType!); });
@@ -490,6 +505,8 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 BroadcasterList[player.SteamID].Player = player;
             }
         }
+        
+        CurrentGameMode.OnSessionChanged(oldSessionID, newSessionID);
         return base.OnSessionChanged(oldSessionID, newSessionID);
     }
 
@@ -525,7 +542,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         return Task.CompletedTask;
     }
 
-    public override Task<bool> OnPlayerTypedMessage(BattleBitPlayer player, ChatChannel channel, string msg)
+    public override async Task<bool> OnPlayerTypedMessage(BattleBitPlayer player, ChatChannel channel, string msg)
     {
         if (msg.StartsWith("!") && Permissions[player.SteamID] > 0)
         {
@@ -557,7 +574,11 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                     SayToChat("Not enough Permissions", player);
                 }
             }
+
+            return false;
         }
-        return base.OnPlayerTypedMessage(player, channel, msg);
+
+        await CurrentGameMode.OnPlayerTypedMessage(player, channel, msg);
+        return true;
     }
 }

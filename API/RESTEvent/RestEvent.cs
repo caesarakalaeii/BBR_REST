@@ -41,7 +41,7 @@ public class RestEvent
                     Amount = int.Parse(data[1]);
                     break;
                 case "Tier":
-                    Tier = int.Parse(data[1]);
+                    Tier = int.Parse(data[1]) / 1000;
                     break;
                 case "Username":
                     Username = data[1];

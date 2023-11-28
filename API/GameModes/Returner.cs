@@ -10,4 +10,6 @@ public class Returner
     public string Msg;
     public BattleBitPlayer Player;
     public ulong SteamId;
+    public long oldSessionID;
+    public long newSessionID;
 }

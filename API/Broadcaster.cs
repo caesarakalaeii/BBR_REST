@@ -6,8 +6,11 @@ public class Broadcaster
     {
         SteamId = steamId;
         Player = null;
+        ChaosEnabled = true;
     }
-    
+
+    public bool ChaosEnabled { get; set; }
+
     public BattleBitPlayer? Player { get; set; }
 
     public ulong SteamId { get; set; }

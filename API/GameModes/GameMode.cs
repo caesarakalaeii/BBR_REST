@@ -82,4 +82,17 @@ public class GameMode
         };
         return re;
     }
+
+    public Returner OnSessionChanged(long oldSessionID, long newSessionID)
+    {
+        Reset();
+        Init();
+        var re = new Returner
+        {
+            oldSessionID = oldSessionID,
+            newSessionID = newSessionID
+            
+        };
+        return re;
+    }
 }
