@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Threading.Tasks;
 using BattleBitAPI.Common;
 using BattleBitAPI.Server;
 using ChaosMode.BattleBitCommands;
+using ChaosMode.Modules;
 using Newtonsoft.Json;
 
 namespace ChaosMode.API;
@@ -24,6 +26,8 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     public GameMode CurrentGameMode;
     public bool CyclePlaylist;
     public int GameModeIndex;
+
+    public readonly List<ServerModule> ServerModules;
 
     
     public BattleBitServer()
@@ -48,6 +52,15 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
             new TogglePlaylistCommand(this),
             new AddPermissionCommand(this)
         };
+        ServerModules = new List<ServerModule>
+        {
+            new ChatRewrite(this),
+            new PlayerRoles(this),
+            new IllegalPlayerActions(this),
+            new LoadingScreenText(this)
+        };
+        
+        
         
         GameModeIndex = 0;
         CurrentGameMode = GameModes[GameModeIndex];
@@ -157,14 +170,15 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
                 };
                 break;
             case "Redeem":
-                EventHandler(restEvent);
+                if(restEvent.RedeemType == RedeemTypes.RANDOM) RandomizeRedeem(restEvent);
+                else EventHandler(restEvent);
                 break;
             case "Random":
                 RandomizeRedeem(restEvent);
                 break;
         }
 
-        
+        //todo: add chat message on event end
     }
 
     public void RandomizeRedeem(RestEvent restEvent)
@@ -470,47 +484,42 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
 
 
 
-    //GAMEMODE PASSTHROUGH
-
-    public override Task<OnPlayerSpawnArguments?> OnPlayerSpawning(BattleBitPlayer player, OnPlayerSpawnArguments request)
+    //GAMEMODE AND MODULE PASSTHROUGH
+    
+    public void AddEvent(ServerModule @module, BattleBitServer server)
     {
-        var ret = CurrentGameMode.OnPlayerSpawning(player, request);
-        return base.OnPlayerSpawning(ret.Player, ret.SpawnArguments);
-    }
-    public override Task OnPlayerSpawned(BattleBitPlayer player)
-    {
-        var ret = CurrentGameMode.OnPlayerSpawned(player);
-        return base.OnPlayerSpawned(ret);
-    }
-
-    public override Task OnAPlayerDownedAnotherPlayer(OnPlayerKillArguments<BattleBitPlayer> args)
-    {
+        @module.Server = server;
         
-        var ret = CurrentGameMode.OnAPlayerDownedAnotherPlayer(args);
-        return base.OnAPlayerDownedAnotherPlayer(ret);
+        ServerModules.Add(@module);
     }
 
-    public override Task OnPlayerGivenUp(BattleBitPlayer player)
+    public void RemoveEvent(ServerModule @module)
     {
-        var ret = CurrentGameMode.OnPlayerGivenUp(player);
-        return base.OnPlayerGivenUp(ret);
+        if (!ServerModules.Contains(@module))
+            return;
+
+        ServerModules.Remove(@module);
     }
 
-    public override Task OnSessionChanged(long oldSessionID, long newSessionID)
+    public override async Task OnConnected()
     {
-        foreach (var player in AllPlayers)
-        {
-            if (BroadcasterList.Keys.Contains(player.SteamID))
-            {
-                BroadcasterList[player.SteamID].Player = player;
-            }
-        }
-        
-        CurrentGameMode.OnSessionChanged(oldSessionID, newSessionID);
-        return base.OnSessionChanged(oldSessionID, newSessionID);
+        foreach (var @module in ServerModules)
+            await @module.OnConnected();
     }
 
-    public override Task OnPlayerConnected(BattleBitPlayer player)
+    public override async Task OnTick()
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnTick();
+    }
+
+    public override async Task OnDisconnected()
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnDisconnected();
+    }
+
+    public override async Task OnPlayerConnected(BattleBitPlayer player)
     {
         if (BroadcasterList.Keys.Contains(player.SteamID))
         {
@@ -521,25 +530,20 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         {
             Permissions[player.SteamID] = 0;
         }
-        
-        this.SayToAllChat("<color=green>" + player.Name + " joined the game!</color>");
-        player.Message($"Current GameMode is: {CurrentGameMode.Name}", 4f);
-        Program.Logger.Info("Connected: " + player);
-
-        player.JoinSquad(Squads.Alpha);
-        return Task.CompletedTask;
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerConnected(player);
     }
 
-    public override Task OnPlayerDisconnected(BattleBitPlayer player)
+    public override async Task OnPlayerDisconnected(BattleBitPlayer player)
     {
         if (BroadcasterList.Keys.Contains(player.SteamID))
         {
             BroadcasterList[player.SteamID].Player = null;
         }
-        Program.Logger.Info($"{player.Name} disconnected");
-        this.SayToAllChat($"<color=red>{player.Name} left the game!</color>");
         CurrentGameMode.OnPlayerDisconnected(player);
-        return Task.CompletedTask;
+        
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerDisconnected(player);
     }
 
     public override async Task<bool> OnPlayerTypedMessage(BattleBitPlayer player, ChatChannel channel, string msg)
@@ -579,6 +583,165 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         }
 
         await CurrentGameMode.OnPlayerTypedMessage(player, channel, msg);
+        foreach (var @module in ServerModules)
+            if (!await @module.OnPlayerTypedMessage(player, channel, msg))
+                return false;
+
         return true;
     }
+
+    public override async Task OnPlayerJoiningToServer(ulong steamID, PlayerJoiningArguments args)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerJoiningToServer(steamID, args);
+    }
+
+    public override async Task OnSavePlayerStats(ulong steamID, PlayerStats stats)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnSavePlayerStats(steamID, stats);
+    }
+
+    public override async Task<bool> OnPlayerRequestingToChangeRole(BattleBitPlayer player, GameRole requestedRole)
+    {
+        foreach (var @module in ServerModules)
+            if (!await @module.OnPlayerRequestingToChangeRole(player, requestedRole))
+                return false;
+
+        return true;
+    }
+
+    public override async Task<bool> OnPlayerRequestingToChangeTeam(BattleBitPlayer player, Team requestedTeam)
+    {
+        foreach (var @module in ServerModules)
+            if (!await @module.OnPlayerRequestingToChangeTeam(player, requestedTeam))
+                return false;
+
+        return true;
+    }
+
+    public override async Task OnPlayerChangedRole(BattleBitPlayer player, GameRole role)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerChangedRole(player, role);
+    }
+
+    public override async Task OnPlayerJoinedSquad(BattleBitPlayer player, Squad<BattleBitPlayer> squad)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerJoinedSquad(player, squad);
+    }
+
+    public override async Task OnSquadLeaderChanged(Squad<BattleBitPlayer> squad, BattleBitPlayer newLeader)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnSquadLeaderChanged(squad, newLeader);
+    }
+
+    public override async Task OnPlayerLeftSquad(BattleBitPlayer player, Squad<BattleBitPlayer> squad)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerLeftSquad(player, squad);
+    }
+    
+    public override async Task OnPlayerChangeTeam(BattleBitPlayer player, Team team)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerChangeTeam(player, team);
+    }
+    
+    public override async Task OnSquadPointsChanged(Squad<BattleBitPlayer> squad, int newPoints)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnSquadPointsChanged(squad, newPoints);
+    }
+    
+    public override async Task<OnPlayerSpawnArguments?> OnPlayerSpawning(BattleBitPlayer player, OnPlayerSpawnArguments request)
+    {
+        CurrentGameMode.OnPlayerSpawning(player, request);
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerSpawning(player, request);
+
+        return request;
+    }
+    
+    public override async Task OnPlayerSpawned(BattleBitPlayer player)
+    {
+        var ret = CurrentGameMode.OnPlayerSpawned(player);
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerSpawned(player);
+    }
+    
+    public override async Task OnPlayerDied(BattleBitPlayer player)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerDied(player);
+    }
+    
+    public override async Task OnPlayerGivenUp(BattleBitPlayer player)
+    {
+        var ret = CurrentGameMode.OnPlayerGivenUp(player);
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerGivenUp(player);
+    }
+    
+    public override async Task OnAPlayerDownedAnotherPlayer(OnPlayerKillArguments<BattleBitPlayer> args)
+    {
+        var ret = CurrentGameMode.OnAPlayerDownedAnotherPlayer(args);
+        foreach (var @module in ServerModules)
+            await @module.OnAPlayerDownedAnotherPlayer(args);
+    }
+    
+    public override async Task OnAPlayerRevivedAnotherPlayer(BattleBitPlayer from, BattleBitPlayer to)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnAPlayerRevivedAnotherPlayer(from, to);
+    }
+    
+    public override async Task OnPlayerReported(BattleBitPlayer from, BattleBitPlayer to, ReportReason reason, string additional)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnPlayerReported(from, to, reason, additional);
+    }
+    
+    public override async Task OnGameStateChanged(GameState oldState, GameState newState)
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnGameStateChanged(oldState, newState);
+    }
+    
+    public override async Task OnRoundStarted()
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnRoundStarted();
+    }
+    
+    public override async Task OnRoundEnded()
+    {
+        foreach (var @module in ServerModules)
+            await @module.OnRoundEnded();
+    }
+    
+    public override async Task OnSessionChanged(long oldSessionID, long newSessionID)
+    {
+        foreach (var player in AllPlayers)
+        {
+            if (BroadcasterList.Keys.Contains(player.SteamID))
+            {
+                BroadcasterList[player.SteamID].Player = player;
+            }
+        }
+        
+        CurrentGameMode.OnSessionChanged(oldSessionID, newSessionID);
+        foreach (var @module in ServerModules)
+            await @module.OnSessionChanged(oldSessionID, newSessionID);
+    }
+    
+    
+    
+  
+  
+    
+
+ 
 }

@@ -13,6 +13,6 @@ public enum RedeemTypes
     BLEED,
     TRUNTABLES,
     MEELEE, 
-    DEFAULT
-    
+    DEFAULT,
+    RANDOM
 }

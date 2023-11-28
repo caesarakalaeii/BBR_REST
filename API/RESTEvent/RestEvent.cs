@@ -84,6 +84,8 @@ public class RestEvent
                 return RedeemTypes.TRUNTABLES;
             case "melee":
                 return RedeemTypes.MEELEE;
+            case "random":
+                return RedeemTypes.RANDOM;
             default:
                 return RedeemTypes.DEFAULT;
         }
