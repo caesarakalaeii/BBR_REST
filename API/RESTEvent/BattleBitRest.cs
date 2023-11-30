@@ -124,7 +124,7 @@ public class BattleBitRest : ControllerBase
         Program.Logger.Info("Sending Vote Start data.");
         
         var apiUrl = "https://ttv2bbr.laeii.de/vote";
-        var jsonData = $"\"Vote\":\"Start\",\"SteamId\":\"{broadcaster.SteamId}\"";
+        var jsonData = $"{{\"Vote\":\"Start\",\"SteamId\":\"{broadcaster.SteamId}\"}}";
         await SendJsonData(apiUrl, jsonData);
     }
     
@@ -133,7 +133,7 @@ public class BattleBitRest : ControllerBase
         Program.Logger.Info("Sending Vote End data.");
 
         var apiUrl = "https://ttv2bbr.laeii.de/vote";
-        var jsonData = $"\"Vote\":\"Stop\",\"SteamId\":\"{broadcaster.SteamId}\"";
+        var jsonData = $"{{\"Vote\":\"Stop\",\"SteamId\":\"{broadcaster.SteamId}\"}}";
         await SendJsonData(apiUrl, jsonData);
     }
 
