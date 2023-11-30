@@ -230,7 +230,8 @@ internal class Program
     private static void StartRest()
     {
         Logger.Info("Starting REST API");
-        BattleBitRest rest = new BattleBitRest(ServerConfiguration.IP, ServerConfiguration.RestPort);
+        BattleBitRest rest = new BattleBitRest(ServerConfiguration.RestPort);
+        Server.Rest = rest;
         rest.Run();
     }
 }

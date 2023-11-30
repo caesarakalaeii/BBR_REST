@@ -15,7 +15,7 @@ namespace ChaosMode.API;
 public class BattleBitRest : ControllerBase
 {
     private string _urlString;
-    public BattleBitRest(string ip, int port)
+    public BattleBitRest(int port)
     {
         _urlString = $"http://*:{port}/";
     }
@@ -90,6 +90,8 @@ public class BattleBitRest : ControllerBase
     
     static async Task SendJsonData(string apiUrl, string jsonData)
     {
+        Program.Logger.Info("Trying to send data.");
+
         using (HttpClient client = new HttpClient())
         {
             // Create the content to be sent in the request
@@ -119,6 +121,8 @@ public class BattleBitRest : ControllerBase
 
     public async void StartVotesREST(Broadcaster broadcaster)
     {
+        Program.Logger.Info("Sending Vote Start data.");
+        
         var apiUrl = "https://ttv2bbr.laeii.de/vote";
         var jsonData = $"\"Vote\":\"Start\",\"SteamId\":\"{broadcaster.SteamId}\"";
         await SendJsonData(apiUrl, jsonData);
@@ -126,6 +130,8 @@ public class BattleBitRest : ControllerBase
     
     public async void StopVotesREST(Broadcaster broadcaster)
     {
+        Program.Logger.Info("Sending Vote End data.");
+
         var apiUrl = "https://ttv2bbr.laeii.de/vote";
         var jsonData = $"\"Vote\":\"Stop\",\"SteamId\":\"{broadcaster.SteamId}\"";
         await SendJsonData(apiUrl, jsonData);

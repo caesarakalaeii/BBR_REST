@@ -26,6 +26,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     public GameMode CurrentGameMode;
     public bool CyclePlaylist;
     public int GameModeIndex;
+    public BattleBitRest Rest { get; set; }
 
     public readonly List<ServerModule> ServerModules;
 
@@ -61,7 +62,6 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
             new IllegalPlayerActions(this),
             new LoadingScreenText(this)
         };
-        
         
         
         GameModeIndex = 0;
@@ -161,6 +161,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         {
             BroadcasterList[player.SteamID].Player = player;
             RedeemHandlers[player.SteamID].Player = player;
+            Rest.StartVotesREST(BroadcasterList[player.SteamID]);
         }
 
         if (!Permissions.Keys.Contains(player.SteamID))
@@ -176,11 +177,13 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         if (BroadcasterList.Keys.Contains(player.SteamID))
         {
             BroadcasterList[player.SteamID].Player = null;
+            Rest.StopVotesREST(BroadcasterList[player.SteamID]);
         }
 
         if (RedeemHandlers.Keys.Contains(player.SteamID))
         {
             RedeemHandlers[player.SteamID].Vote.Player = null;
+            
         }
         
         CurrentGameMode.OnPlayerDisconnected(player);
