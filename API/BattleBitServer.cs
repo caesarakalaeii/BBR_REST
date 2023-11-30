@@ -74,7 +74,6 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         }
         Permissions[76561198053896127] = 50; // Add Admin perms for caesar
         
-        StartRest();
     }
 
 
@@ -143,7 +142,6 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     {
         foreach (var @module in ServerModules)
             await @module.OnConnected();
-        StartRest();
     }
 
     public override async Task OnTick()
@@ -387,13 +385,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     }
     
     
-    private void StartRest()
-    {
-        Program.Logger.Info("Starting REST API");
-        BattleBitRest rest = new BattleBitRest(Program.ServerConfiguration.RestPort);
-        Rest = rest;
-        Task.Run(rest.Run());
-    }
+  
     
     
     

@@ -50,6 +50,7 @@ internal class Program
             LoadConfiguration();
             ValidateConfiguration();
             StartServerListener();
+            StartRest();
         }
         catch (Exception ex)
         {
@@ -226,7 +227,17 @@ internal class Program
         commandHandler.Listen();
     }
 
-    
+    private static async void StartRest()
+    {
+        while (Server == null)
+        {
+            await Task.Delay(2);
+        }
+        Logger.Info("Starting REST API");
+        BattleBitRest rest = new BattleBitRest(ServerConfiguration.RestPort);
+        Server.Rest = rest;
+        rest.Run();
+    }
 }
 
 
