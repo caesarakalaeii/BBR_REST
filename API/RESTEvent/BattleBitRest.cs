@@ -23,7 +23,7 @@ public class BattleBitRest : ControllerBase
     
     
     
-    public void Run()
+    public Action Run()
     {
         
 

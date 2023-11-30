@@ -143,6 +143,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     {
         foreach (var @module in ServerModules)
             await @module.OnConnected();
+        StartRest();
     }
 
     public override async Task OnTick()
@@ -391,7 +392,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         Program.Logger.Info("Starting REST API");
         BattleBitRest rest = new BattleBitRest(Program.ServerConfiguration.RestPort);
         Rest = rest;
-        rest.Run();
+        Task.Run(rest.Run());
     }
     
     
