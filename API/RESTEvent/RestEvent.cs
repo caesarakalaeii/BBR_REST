@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace ChaosMode.API;
@@ -60,6 +61,7 @@ public class RestEvent
                     Choices = new List<int>();
                     if (jsonString.Contains("[]")) /// if array empty break
                     {
+                        Choices = Enumerable.Repeat(0, 4).ToList();
                         break;
                     }
                     var choiceString = jsonString.Split("[")[1].Split("]")[0]; // find data encased in [1, 2, 2 ]
@@ -67,6 +69,11 @@ public class RestEvent
                     foreach (var value in values) 
                     {
                         Choices.Add(int.Parse(value)); // convert the seperated values into int and add to choices
+                    }
+
+                    for (int i = Choices.Count; i < 4; i++)
+                    {
+                        Choices.Add(0); // add with 0s as neccecary
                     }
                     break;
                     

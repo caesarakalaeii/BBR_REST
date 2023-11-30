@@ -72,6 +72,7 @@ public class Vote
 
     public string GenerateUpdateString()
     {
+        //todo: looks broken, make nicer
         var choiceStrings = GenerateChoiceStrings();
         return $"{r.Align("center")}{r.Bold(true)} VOTE: {r.Bold(false)} ({RemainingTime}s){r.Align()}{r.NewLine()}" +
                $"{r.Align("left")}{choiceStrings[0]}{r.Align()} {r.Align("right")}{choiceStrings[1]}{r.Align()}{r.NewLine()}" +
