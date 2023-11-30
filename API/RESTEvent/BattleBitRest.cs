@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -57,7 +60,7 @@ public class BattleBitRest : ControllerBase
 
                         try
                         {
-                            Program.Server.ConsumeCommand(restEvent);
+                            Program.Server.RedeemHandlers[restEvent.SteamId].ConsumeCommand(restEvent);
                         }
                         catch (KeyNotFoundException e)
                         {
@@ -82,6 +85,49 @@ public class BattleBitRest : ControllerBase
             // Close the output stream
             response.OutputStream.Close();
         }
+    }
+    
+    static async Task SendJsonData(string apiUrl, string jsonData)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            // Create the content to be sent in the request
+            HttpContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+            try
+            {
+                // Make the POST request
+                HttpResponseMessage response = await client.PostAsync(apiUrl, content);
+
+                // Check if the request was successful
+                if (response.IsSuccessStatusCode)
+                {
+                    Program.Logger.Info("JSON data sent successfully.");
+                }
+                else
+                {
+                    Program.Logger.Warn($"Error sending JSON data. Status code: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.Logger.Warn($"An error occurred: {ex.Message}");
+            }
+        }
+    }
+
+    public async void StartVotesREST(Broadcaster broadcaster)
+    {
+        var apiUrl = "https://ttv2bbr.laeii.de/vote";
+        var jsonData = $"\"Vote\":\"Start\",\"SteamId\":\"{broadcaster.SteamId}\"";
+        await SendJsonData(apiUrl, jsonData);
+    }
+    
+    public async void StopVotesREST(Broadcaster broadcaster)
+    {
+        var apiUrl = "https://ttv2bbr.laeii.de/vote";
+        var jsonData = $"\"Vote\":\"Stop\",\"SteamId\":\"{broadcaster.SteamId}\"";
+        await SendJsonData(apiUrl, jsonData);
     }
 
   

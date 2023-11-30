@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ChaosMode.API;
 
@@ -54,6 +55,16 @@ public class RestEvent
                     break;
                 case "GifterName":
                     GifterName = data[1];
+                    break;
+                case "Choices":
+                    Choices = new List<int>();
+                    for (int i = 1; i < data.Length; i++)
+                    {
+                        Choices.Add(int.Parse(data[i]));
+                    }
+                    break;
+                case "Time":
+                    RemainingTime = int.Parse(data[1]);
                     break;
             }
         }
@@ -116,6 +127,10 @@ public class RestEvent
     public int? Streak { get; set; }
     
     public string? GifterName { get; set; }
+    
+    public int? RemainingTime { get; set; }
+    
+    public List<int> Choices { get; set; }
 
     public override string ToString()
     {
