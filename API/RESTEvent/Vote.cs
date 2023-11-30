@@ -24,7 +24,7 @@ public class Vote
         Choices = new List<RedeemTypes>();
         for (int i = 0; i < 4; i++)
         {
-            Choices[i] = RedeemHandler.GenerateRandomRedeem();
+            Choices.Add(RedeemHandler.GenerateRandomRedeem());
         }
         Player?.Message(GenerateUpdateString());
     }
