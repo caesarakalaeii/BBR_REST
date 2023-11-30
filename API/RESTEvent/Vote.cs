@@ -36,7 +36,13 @@ public class Vote
     {
         
         RemainingTime = restEvent.RemainingTime;
-        Votes = restEvent.Choices;
+        if (restEvent.Choices.Count <1)
+        {
+            Votes = Enumerable.Repeat(0, 4).ToList();
+            
+        }
+        else Votes = restEvent.Choices;
+        
         TotalVotes = Votes.Sum();
         
         Player?.Message(GenerateUpdateString());
