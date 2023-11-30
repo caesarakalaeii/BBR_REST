@@ -58,11 +58,19 @@ public class RestEvent
                     break;
                 case "Choices":
                     Choices = new List<int>();
-                    for (int i = 1; i < data.Length; i++)
+                    if (jsonString.Contains("[]")) /// if array empty break
                     {
-                        Choices.Add(int.Parse(data[i]));
+                        break;
+                    }
+                    var choiceString = jsonString.Split("[")[1].Split("]")[0]; // find data encased in [1, 2, 2 ]
+                    var values = choiceString.Split(","); // seperate data 1 2 3
+                    foreach (var value in values) 
+                    {
+                        Choices.Add(int.Parse(value)); // convert the seperated values into int and add to choices
                     }
                     break;
+                    
+                    
                 case "Time":
                     RemainingTime = int.Parse(data[1]);
                     break;
