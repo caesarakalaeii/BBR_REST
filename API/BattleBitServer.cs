@@ -50,7 +50,9 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
             new NextGmCommand(this),
             new SetGmCommand(this),
             new TogglePlaylistCommand(this),
-            new AddPermissionCommand(this)
+            new AddPermissionCommand(this),
+            new ToggleRedeemsCommand(this),
+            new ToggleVoteCommand(this)
         };
         ServerModules = new List<ServerModule>
         {
@@ -175,6 +177,12 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         {
             BroadcasterList[player.SteamID].Player = null;
         }
+
+        if (RedeemHandlers.Keys.Contains(player.SteamID))
+        {
+            RedeemHandlers[player.SteamID].Vote.Player = null;
+        }
+        
         CurrentGameMode.OnPlayerDisconnected(player);
         
         foreach (var @module in ServerModules)

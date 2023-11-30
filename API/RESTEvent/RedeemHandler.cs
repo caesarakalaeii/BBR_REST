@@ -14,7 +14,7 @@ public class RedeemHandler
     
     
     private Dictionary<RedeemTypes, Queue<Func<Task>>> RedeemQueues = new();
-    private Dictionary<ulong, Vote> Votes = new();
+    public Vote Vote = new();
     private readonly Array _availableRedeems = Enum.GetValues(typeof(RedeemTypes));
     public bool IsRunning;
     public BattleBitServer Server;
@@ -25,10 +25,7 @@ public class RedeemHandler
         Player = player;
         Server = server;
         IsRunning = false;
-        foreach (var steamId in Server.BroadcasterList.Keys)
-        {
-            Votes[steamId] = new Vote();
-        }
+        Vote = new Vote();
         foreach (var enumValue in _availableRedeems)
         {
             RedeemQueues[(RedeemTypes)enumValue] = new Queue<Func<Task>>();
@@ -165,16 +162,16 @@ public class RedeemHandler
                 RandomizeRedeem(restEvent);
                 break;
             case "VoteOnGoing":
-                if (!Votes.Keys.Contains(restEvent.SteamId))
+                if (Server.BroadcasterList[restEvent.SteamId].AcceptsVotes)
                 {
-                    Votes[restEvent.SteamId] = new Vote();
-                    Votes[restEvent.SteamId].Player = Server.BroadcasterList[restEvent.SteamId].Player;
-                    Votes[restEvent.SteamId].StartVote();
+                    Vote = new Vote();
+                    Vote.Player = Server.BroadcasterList[restEvent.SteamId].Player;
+                    Vote.StartVote();
                 }
-                Votes[restEvent.SteamId].UpdateVote(restEvent);
+                Vote.UpdateVote(restEvent);
                 break;
             case "VoteEnd":
-                Votes[restEvent.SteamId].EndVote(restEvent);
+                Vote.EndVote(restEvent);
                 break;
                 
         }
@@ -197,7 +194,7 @@ public class RedeemHandler
     public void EventHandler(RestEvent restEvent)
     {
         RedeemHandler rHandler = Server.RedeemHandlers[restEvent.SteamId];
-        
+        if(!Server.BroadcasterList[restEvent.SteamId].AcceptsRedeems || Server.BroadcasterList[restEvent.SteamId].AcceptsVotes) return;
                 switch (restEvent.RedeemType)
                 {
                     case RedeemTypes.HEAL:

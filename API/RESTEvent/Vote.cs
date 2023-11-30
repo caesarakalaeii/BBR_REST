@@ -21,11 +21,12 @@ public class Vote
     }
     public void StartVote()
     {
+        
         for (int i = 0; i < 4; i++)
         {
             Choices[i] = RedeemHandler.GenerateRandomRedeem();
         }
-        Player.Message(GenerateUpdateString());
+        Player?.Message(GenerateUpdateString());
     }
 
     
@@ -38,7 +39,7 @@ public class Vote
         Votes = restEvent.Choices;
         TotalVotes = Votes.Sum();
         
-        Player.Message(GenerateUpdateString());
+        Player?.Message(GenerateUpdateString());
         
         
         
@@ -51,7 +52,7 @@ public class Vote
         int maxIndex = Votes.IndexOf(maxValue);
         var winner = Choices[maxIndex];
 
-        Player.Message(
+        Player?.Message(
             $"{r.Align("center")}{r.Bold(true)} VOTE: {r.Bold(false)} ({RemainingTime}){r.Align()}{r.NewLine()}{r.Align("center")}WINNER: {winner}");
     }
 

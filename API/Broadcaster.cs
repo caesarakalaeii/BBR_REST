@@ -7,7 +7,13 @@ public class Broadcaster
         SteamId = steamId;
         Player = null;
         ChaosEnabled = true;
+        AcceptsRedeems = false;
+        AcceptsVotes = true;
     }
+
+    public bool AcceptsVotes { get; set; }
+
+    public bool AcceptsRedeems { get; set; }
 
     public bool ChaosEnabled { get; set; }
 
