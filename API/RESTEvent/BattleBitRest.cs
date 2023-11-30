@@ -65,6 +65,7 @@ public class BattleBitRest : ControllerBase
                         catch (KeyNotFoundException e)
                         {
                             Program.Logger.Warn("Broadcaster not in List");
+                            
                         }
                     }
                 }
