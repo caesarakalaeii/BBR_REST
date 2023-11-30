@@ -13,19 +13,26 @@ public class Vote
     private List<int> Votes;
     private int? RemainingTime;
     private int? TotalVotes;
-    
-    
+    public bool isOnGoing;
+
+
     public Vote()
     {
         
     }
     public void StartVote()
     {
+        isOnGoing = true;
         Choices = new List<RedeemTypes>();
         Votes = Enumerable.Repeat(0, 4).ToList();
         for (int i = 0; i < 4; i++)
         {
-            Choices.Add(RedeemHandler.GenerateRandomRedeem());
+            var redeem = RedeemHandler.GenerateRandomRedeem();
+            while (Choices.Contains(redeem))
+            {
+                redeem = RedeemHandler.GenerateRandomRedeem();
+            }
+            Choices.Add(redeem);
             
         }
         Player?.Message(GenerateUpdateString());
@@ -53,6 +60,7 @@ public class Vote
 
     public void EndVote(RestEvent restEvent)
     {
+        isOnGoing = false;
         Votes = restEvent.Choices;
         int maxValue = Votes.Max();
         int maxIndex = Votes.IndexOf(maxValue);

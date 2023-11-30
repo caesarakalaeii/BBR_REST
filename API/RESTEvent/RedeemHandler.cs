@@ -162,7 +162,7 @@ public class RedeemHandler
                 RandomizeRedeem(restEvent);
                 break;
             case "VoteOnGoing":
-                if (Server.BroadcasterList[restEvent.SteamId].AcceptsVotes)
+                if (Server.BroadcasterList[restEvent.SteamId].AcceptsVotes && !Vote.isOnGoing)
                 {
                     Vote = new Vote();
                     Vote.Player = Server.BroadcasterList[restEvent.SteamId].Player;
