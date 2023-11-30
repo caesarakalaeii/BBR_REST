@@ -22,9 +22,11 @@ public class Vote
     public void StartVote()
     {
         Choices = new List<RedeemTypes>();
+        Votes = Enumerable.Repeat(0, 4).ToList();
         for (int i = 0; i < 4; i++)
         {
             Choices.Add(RedeemHandler.GenerateRandomRedeem());
+            
         }
         Player?.Message(GenerateUpdateString());
     }
@@ -36,12 +38,10 @@ public class Vote
     {
         
         RemainingTime = restEvent.RemainingTime;
-        if (restEvent.Choices.Count <1)
+        if (restEvent.Choices.Count  == 4)
         {
-            Votes = Enumerable.Repeat(0, 4).ToList();
-            
+            Votes = restEvent.Choices;
         }
-        else Votes = restEvent.Choices;
         
         TotalVotes = Votes.Sum();
         
