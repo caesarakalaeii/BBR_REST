@@ -119,6 +119,15 @@ public class BattleBitRest : ControllerBase
         }
     }
 
+    public async void InitVotesREST(Broadcaster broadcaster)
+    {
+        Program.Logger.Info("Sending Vote Init data.");
+        
+        var apiUrl = "https://ttv2bbr.laeii.de/vote";
+        var jsonData = $"{{\"Vote\":\"Init\",\"SteamId\":\"{broadcaster.SteamId}\"}}";
+        await SendJsonData(apiUrl, jsonData);
+    }
+
     public async void StartVotesREST(Broadcaster broadcaster)
     {
         Program.Logger.Info("Sending Vote Start data.");

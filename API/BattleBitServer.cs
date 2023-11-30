@@ -162,7 +162,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         {
             BroadcasterList[player.SteamID].Player = player;
             RedeemHandlers[player.SteamID].Player = player;
-            Rest.StartVotesREST(BroadcasterList[player.SteamID]);
+            Rest.InitVotesREST(BroadcasterList[player.SteamID]);
         }
 
         if (!Permissions.Keys.Contains(player.SteamID))
@@ -308,7 +308,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
         CurrentGameMode.OnPlayerSpawning(player, request);
         foreach (var @module in ServerModules)
             await @module.OnPlayerSpawning(player, request);
-
+        Rest.StartVotesREST(BroadcasterList[player.SteamID]);
         return request;
     }
     
@@ -321,6 +321,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     
     public override async Task OnPlayerDied(BattleBitPlayer player)
     {
+        //todo: let votes wait on respawn
         foreach (var @module in ServerModules)
             await @module.OnPlayerDied(player);
     }
