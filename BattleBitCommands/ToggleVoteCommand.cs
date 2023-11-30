@@ -15,6 +15,8 @@ public class ToggleVoteCommand: InGameCommand
     public override void CommandCallback(BattleBitPlayer commandSource)
     {
         R.BroadcasterList[commandSource.SteamID].AcceptsVotes = !R.BroadcasterList[commandSource.SteamID].AcceptsVotes;
+        commandSource.SayToChat($"Votes are now {R.BroadcasterList[commandSource.SteamID].AcceptsVotes}");
+
     }
 
     public override void CommandCallback(BattleBitPlayer commandSource, string commandValue)

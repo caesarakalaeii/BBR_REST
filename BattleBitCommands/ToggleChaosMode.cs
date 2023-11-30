@@ -16,7 +16,7 @@ public class ToggleChaosMode : InGameCommand
     public override void CommandCallback(BattleBitPlayer commandSource)
     {
         R.BroadcasterList[commandSource.SteamID].ChaosEnabled = !R.BroadcasterList[commandSource.SteamID].ChaosEnabled;
-        
+        commandSource.SayToChat($"Chaosmode is now {R.BroadcasterList[commandSource.SteamID].ChaosEnabled}");
     }
 
     public override void CommandCallback(BattleBitPlayer commandSource, string commandValue)

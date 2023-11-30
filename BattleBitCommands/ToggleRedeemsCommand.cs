@@ -15,6 +15,8 @@ public class ToggleRedeemsCommand: InGameCommand
     public override void CommandCallback(BattleBitPlayer commandSource)
     {
         R.BroadcasterList[commandSource.SteamID].AcceptsRedeems = !R.BroadcasterList[commandSource.SteamID].AcceptsRedeems;
+        commandSource.SayToChat($"Redeems are now {R.BroadcasterList[commandSource.SteamID].AcceptsRedeems}");
+
     }
 
     public override void CommandCallback(BattleBitPlayer commandSource, string commandValue)
