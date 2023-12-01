@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using BattleBitAPI.Common;
+using ChaosMode.Modules;
 
 namespace ChaosMode.API.RESTEvent;
 
@@ -153,6 +154,8 @@ public class RedeemHandler
                 };
                 break;
             case "Redeem":
+                if(!Server.BroadcasterList[restEvent.SteamId].AcceptsRedeems) return; // return if no redeems are accepted
+                
                 if(restEvent.RedeemType == RedeemTypes.RANDOM) RandomizeRedeem(restEvent);
                 else EventHandler(restEvent);
                 break;
@@ -191,68 +194,75 @@ public class RedeemHandler
 
     public void EventHandler(RestEvent restEvent)
     {
-        
-        if(!Server.BroadcasterList[restEvent.SteamId].AcceptsRedeems || Server.BroadcasterList[restEvent.SteamId].AcceptsVotes) return;
-                switch (restEvent.RedeemType)
-                {
-                    case RedeemTypes.HEAL:
-                        //heals the player
-                        Heal(restEvent);
-                        break;
-                    case RedeemTypes.KILL:
-                        // kills the player
-                        Kill(restEvent);
-                        break;
-                    case RedeemTypes.SWAP:
-                        // switch player with random one (Wierd behavior if player is in save zone)
-                        Swap(restEvent);
-                        break;
-                    case RedeemTypes.REVEAL: // Apparently non functional TODO: debug this
-                        Reveal(restEvent);
-                        break;
-                    case RedeemTypes.ZOOMIES:
-                        Zoomies(restEvent);
-                        break;
-                    case RedeemTypes.GLASS:
-                        Glass(restEvent);
-                        break;
-                    case RedeemTypes.FREEZE:
-                        Freeze(restEvent);
-                        break;
-                    case RedeemTypes.BLEED:
-                        Bleed(restEvent);
-                        break;
-                    case RedeemTypes.TRUNTABLES:
-                        TurnTables(restEvent);
-                        break;
-                    case RedeemTypes.MEELEE:
-                        Melee(restEvent);
-                        break;
-                    
-                        
-                    
-                    // Enums are there, Twitch and BattleBit parts need to be added
-                    
-                    // zoomies 4 all
-                    // ammo set ammo to 0?
-                    // disable UI
-                        
-                        
-                }
 
-                if (!IsRunning && Server.BroadcasterList[restEvent.SteamId].ChaosEnabled)
-                { // spawn new redeem queue instance if old one is not running
-                    Program.Logger.Info($"Spawning new Handler for {restEvent.RedeemType}");
-                    Task.Run(() => {Run(restEvent.RedeemType!); });
-                }
+        if (!Server.BroadcasterList[restEvent.SteamId].AcceptsRedeems &&
+            !Server.BroadcasterList[restEvent.SteamId].AcceptsVotes) return;
+        
+        switch (restEvent.RedeemType)
+            {
+                case RedeemTypes.HEAL:
+                    //heals the player
+                    Heal(restEvent);
+                    break;
+                case RedeemTypes.KILL:
+                    // kills the player
+                    Kill(restEvent);
+                    break;
+                case RedeemTypes.SWAP:
+                    // switch player with random one (Wierd behavior if player is in save zone)
+                    Swap(restEvent);
+                    break;
+                case RedeemTypes.REVEAL: // Apparently non functional TODO: debug this
+                    Reveal(restEvent);
+                    break;
+                case RedeemTypes.ZOOMIES:
+                    Zoomies(restEvent);
+                    break;
+                case RedeemTypes.GLASS:
+                    Glass(restEvent);
+                    break;
+                case RedeemTypes.FREEZE:
+                    Freeze(restEvent);
+                    break;
+                case RedeemTypes.BLEED:
+                    Bleed(restEvent);
+                    break;
+                case RedeemTypes.TRUNTABLES:
+                    TurnTables(restEvent);
+                    break;
+                case RedeemTypes.MEELEE:
+                    Melee(restEvent);
+                    break;
+                
+                    
+                
+                // Enums are there, Twitch and BattleBit parts need to be added
+                
+                // zoomies 4 all
+                // ammo set ammo to 0?
+                // disable UI
+                    
+                    
+            }
+
+            if (!IsRunning && Server.BroadcasterList[restEvent.SteamId].ChaosEnabled)
+            { // spawn new redeem queue instance if old one is not running
+                Program.Logger.Info($"Spawning new Handler for {restEvent.RedeemType}");
+                Task.Run(() => {Run(restEvent.RedeemType!); });
+            }
     }
 
     public static RedeemTypes GenerateRandomRedeem()
     {
         Array enumValues = Enum.GetValues(typeof(RedeemTypes));
         Random random = new Random();
-        return (RedeemTypes)(enumValues.GetValue(random.Next(enumValues.Length)) ?? RedeemTypes.DEFAULT);
-        
+        var redeem = RedeemTypes.DEFAULT;
+        while (redeem == RedeemTypes.DEFAULT)
+        {
+            redeem = (RedeemTypes)(enumValues.GetValue(random.Next(enumValues.Length)) ?? RedeemTypes.DEFAULT);
+        }
+
+        return redeem;
     }
 
     public static void SwapPlayers(BattleBitPlayer player1, BattleBitPlayer player2)

@@ -65,7 +65,7 @@ public class Vote
         Votes = restEvent.Choices;
         int maxValue = Votes.Max();
         int maxIndex = Votes.IndexOf(maxValue);
-        var winner = Choices[maxIndex];
+        RedeemTypes winner = Choices[maxIndex];
         restEvent.RedeemType = winner;
         restEvent.Username = "Chat";
         Player?.Message(
