@@ -403,13 +403,12 @@ public class RedeemHandler
                     $"Glass mode for {Player?.Name}({restEvent.SteamId})");
                 await Task.Delay(30000);
 
-                if (Player != null)
-                {
-                                
-                    Player.Modifications.FallDamageMultiplier = oldFallDMG;
-                    Player.Modifications.ReceiveDamageMultiplier = oldRecieveDMG;
-                    Player.Message("Glass mode has Ended", 2);
-                }
+                if (Player == null) return;
+                
+                Player.Modifications.FallDamageMultiplier = oldFallDMG;
+                Player.Modifications.ReceiveDamageMultiplier = oldRecieveDMG;
+                Player.Message("Glass mode has Ended", 2);
+                
                 Program.Logger.Info(
                     $"Glass mode off for {Player?.Name}({restEvent.SteamId})");
             });
