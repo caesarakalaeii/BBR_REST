@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ChaosMode.API.Helpers;
+using log4net.Repository.Hierarchy;
 
 namespace ChaosMode.API.RESTEvent;
 
@@ -68,7 +69,8 @@ public class Vote
         restEvent.RedeemType = winner;
         restEvent.Username = "Chat";
         Player?.Message(
-            $"{r.Align("center")}{r.Bold(true)} VOTE: {r.Bold(false)} ({RemainingTime}){r.Align()}{r.NewLine()}{r.Align("center")}WINNER: {winner}");
+            $"{r.Align("center")}{r.Bold(true)} VOTE: {r.Bold(false)} ({RemainingTime}){r.Align()}{r.NewLine()}{r.Align("center")}WINNER: {winner}", 3);
+        Program.Logger.Debug($"Calling EventHandler with {restEvent}");
         Program.Server.RedeemHandlers[restEvent.SteamId].EventHandler(restEvent);
     }
 
