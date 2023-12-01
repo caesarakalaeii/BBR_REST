@@ -311,7 +311,7 @@ public class RedeemHandler
             foreach (var p in Server.AllPlayers)
             {
                 p.Message(
-                    $"{Server.BroadcasterList[restEvent.SteamId].Player?.Name} just went commando thanks {restEvent.Username}! How the turntables!",
+                    $"{Server.BroadcasterList[restEvent.SteamId].Player?.Name} just went commando thanks {restEvent.Username}! Watch your Back!",
                     2);
             }
             Program.Logger.Info(
@@ -319,6 +319,7 @@ public class RedeemHandler
             await Task.Delay(30000);
             
             UpdateLoadout(Player, oldLoadOut); // reset loadout to old one
+            Player?.Message("Have fun with your old Loadout", 2);
 
             
             }
@@ -344,7 +345,7 @@ public class RedeemHandler
                 }
 
                 await Task.Delay(60000);
-                Player?.Message("Bleeding has Ended");
+                Player?.Message("Bleeding has Ended", 2);
                 Player?.Modifications.EnableBleeding(oldMinHpBleed, oldMinDmgBleed);
             }
         });
@@ -374,7 +375,7 @@ public class RedeemHandler
                 {
                                 
                     Player.Modifications.Freeze = false;
-                    Player.Message("Freeze has Ended");
+                    Player.Message("Freeze has Ended", 2);
                     Program.Logger.Info(
                         $"Unfroze {Player?.Name}({restEvent.SteamId})");
                 }
@@ -407,7 +408,7 @@ public class RedeemHandler
                                 
                     Player.Modifications.FallDamageMultiplier = oldFallDMG;
                     Player.Modifications.ReceiveDamageMultiplier = oldRecieveDMG;
-                    Player.Message("Glass mode has Ended");
+                    Player.Message("Glass mode has Ended", 2);
                 }
                 Program.Logger.Info(
                     $"Glass mode off for {Player?.Name}({restEvent.SteamId})");
@@ -437,7 +438,7 @@ public class RedeemHandler
             if (Player != null)
             {
                 Player.Modifications.RunningSpeedMultiplier = oldSpeed;
-                Player.Message("Zoomies have Ended");
+                Player.Message("Zoomies have Ended", 2);
             }
             });
                             
