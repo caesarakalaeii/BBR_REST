@@ -90,9 +90,9 @@ public class Vote
         {
             if (Votes[i] > 0)
             {
-                strings.Add($"{i}: {Choices[i]} ({Votes[i]/TotalVotes*100}%)");
+                strings.Add($"{i+1}: {Choices[i]} ({Votes[i]/TotalVotes*100}%)");
             }
-            else strings.Add($"{i}: {Choices[i]} ({0}%)");
+            else strings.Add($"{i+1}: {Choices[i]} ({0}%)");
         }
 
         return strings;

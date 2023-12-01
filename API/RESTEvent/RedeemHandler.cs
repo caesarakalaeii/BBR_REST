@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using BattleBitAPI;
 using BattleBitAPI.Common;
-using ChaosMode.API.RESTEvent;
 
-namespace ChaosMode.API;
+namespace ChaosMode.API.RESTEvent;
 
 public class RedeemHandler
 {
     
     
     private Dictionary<RedeemTypes, Queue<Func<Task>>> RedeemQueues = new();
-    public Vote Vote = new();
+    public Vote Vote;
     private readonly Array _availableRedeems = Enum.GetValues(typeof(RedeemTypes));
     public bool IsRunning;
     public BattleBitServer Server;
@@ -193,7 +191,7 @@ public class RedeemHandler
 
     public void EventHandler(RestEvent restEvent)
     {
-        RedeemHandler rHandler = Server.RedeemHandlers[restEvent.SteamId];
+        
         if(!Server.BroadcasterList[restEvent.SteamId].AcceptsRedeems || Server.BroadcasterList[restEvent.SteamId].AcceptsVotes) return;
                 switch (restEvent.RedeemType)
                 {
@@ -242,10 +240,10 @@ public class RedeemHandler
                         
                 }
 
-                if (!rHandler.IsRunning && Server.BroadcasterList[restEvent.SteamId].ChaosEnabled)
+                if (!IsRunning && Server.BroadcasterList[restEvent.SteamId].ChaosEnabled)
                 { // spawn new redeem queue instance if old one is not running
                     Program.Logger.Info($"Spawning new Handler for {restEvent.RedeemType}");
-                    Task.Run(() => { rHandler.Run(restEvent.RedeemType!); });
+                    Task.Run(() => {Run(restEvent.RedeemType!); });
                 }
     }
 
