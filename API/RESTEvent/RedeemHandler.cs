@@ -257,7 +257,7 @@ public class RedeemHandler
         Array enumValues = Enum.GetValues(typeof(RedeemTypes));
         Random random = new Random();
         var redeem = RedeemTypes.DEFAULT;
-        while (redeem == RedeemTypes.DEFAULT)
+        while (redeem is RedeemTypes.DEFAULT or RedeemTypes.RANDOM)
         {
             redeem = (RedeemTypes)(enumValues.GetValue(random.Next(enumValues.Length)) ?? RedeemTypes.DEFAULT);
         }
