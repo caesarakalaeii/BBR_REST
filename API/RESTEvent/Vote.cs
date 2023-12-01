@@ -65,9 +65,11 @@ public class Vote
         int maxValue = Votes.Max();
         int maxIndex = Votes.IndexOf(maxValue);
         var winner = Choices[maxIndex];
-
+        restEvent.RedeemType = winner;
+        restEvent.Username = "Chat";
         Player?.Message(
             $"{r.Align("center")}{r.Bold(true)} VOTE: {r.Bold(false)} ({RemainingTime}){r.Align()}{r.NewLine()}{r.Align("center")}WINNER: {winner}");
+        Program.Server.RedeemHandlers[restEvent.SteamId].EventHandler(restEvent);
     }
 
     public string GenerateUpdateString()
