@@ -78,9 +78,9 @@ public class Vote
     {
         //todo: looks broken, make nicer
         var choiceStrings = GenerateChoiceStrings();
-        return $"{r.Size(150)}{r.Align("center")}{r.Bold(true)} VOTE: {r.Bold(false)} ({RemainingTime}s){r.Align()}{r.NewLine()}" +
-               $"{r.Align("left")}{choiceStrings[0]}{r.Align()} {r.HorizontalPosition(75)}{choiceStrings[1]}{r.NewLine()}" +
-               $"{r.Align("left")}{choiceStrings[2]}{r.Align()} {r.HorizontalPosition(75)}{choiceStrings[3]}";
+        return $"{r.Size(125)}{r.Align("center")}{r.Bold(true)} VOTE: {r.Bold(false)} ({RemainingTime}s){r.Align()}{r.NewLine()}" +
+               $"{r.Align("left")}{choiceStrings[0]}{r.Align()} {r.HorizontalPosition(50)}{choiceStrings[1]}{r.NewLine()}" +
+               $"{r.Align("left")}{choiceStrings[2]}{r.Align()} {r.HorizontalPosition(50)}{choiceStrings[3]}";
     }
 
     public List<string> GenerateChoiceStrings()
