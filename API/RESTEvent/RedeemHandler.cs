@@ -418,30 +418,29 @@ public class RedeemHandler
 
     public void Zoomies(RestEvent restEvent)
     {
-        // sets speed to *3 for 1min
+        // sets speed to *3 for 15 secs
         if (Player != null)
         {
             Enqueue(restEvent.RedeemType, async () =>
             {
-            var oldSpeed = Player.Modifications.RunningSpeedMultiplier;
-            Player.Modifications.RunningSpeedMultiplier = oldSpeed * 3;
-                            
-            foreach (var p in Server.AllPlayers)
-            {
-                p.Message(
-                    $"{Player?.Name} has the zoomies thanks to {restEvent.Username}!", 2);
-            }
-            Program.Logger.Info(
-                $"Zoomies for {Player?.Name}({restEvent.SteamId})");
-            await Task.Delay(60000);
+                var oldSpeed = Player.Modifications.RunningSpeedMultiplier;
+                Player.Modifications.RunningSpeedMultiplier = oldSpeed * 3;
 
-            if (Player != null)
-            {
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Message(
+                        $"{Player?.Name} has the zoomies thanks to {restEvent.Username}!", 2);
+                }
+
+                Program.Logger.Info(
+                    $"Zoomies for {Player?.Name}({restEvent.SteamId})");
+                await Task.Delay(15000);
+                if(Player == null)return;
+                
                 Player.Modifications.RunningSpeedMultiplier = oldSpeed;
                 Player.Message("Zoomies have Ended", 2);
-            }
             });
-                            
+
         }
     }
 
@@ -462,11 +461,11 @@ public class RedeemHandler
             Program.Logger.Info(
                 $"Revealed {Player?.Name}({restEvent.SteamId})");
                 await Task.Delay(60000);
-                if (Player != null)
-                {
-                    Player.Modifications.IsExposedOnMap = false;
-                    Player.Message("You are no longer Revealed", 2);
-                }
+                if (Player == null) return;
+                
+                Player.Modifications.IsExposedOnMap = false;
+                Player.Message("You are no longer Revealed", 2);
+                
                 
 
             });
