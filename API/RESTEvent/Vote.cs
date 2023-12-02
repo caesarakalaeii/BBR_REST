@@ -98,6 +98,7 @@ public class Vote
                 if (i == maxIndex)
                 {
                     strings.Add($"{r.Bold(true)}{r.FromColorName("Gold")}{i + 1}: {Choices[i]} ({Votes[i] / TotalVotes * 100}%){r.Color()}{r.Bold(false)}");
+                    continue;
                 }
                 strings.Add($"{i+1}: {Choices[i]} ({Votes[i]/TotalVotes*100}%)");
             }
