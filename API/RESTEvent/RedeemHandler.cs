@@ -239,6 +239,21 @@ public class RedeemHandler
                 case RedeemTypes.ZOOMIES4ALL:
                     Zoomies4All(restEvent);
                     break;
+                case RedeemTypes.BABYJUMP:
+                    BabyJump(restEvent);
+                    break;
+                case RedeemTypes.SPEEDYRELOAD:
+                    SpeedyReload(restEvent);
+                    break;
+                case RedeemTypes.SNAILMOVEMENT:
+                    SnailMovement(restEvent);
+                    break;
+                case RedeemTypes.MOONBOOTS:
+                    MoonBoots(restEvent);
+                    break;
+                case RedeemTypes.WHATISTHIS:
+                    WhatIsThis(restEvent);
+                    break;
                 //case RedeemTypes.JUGGERNAUGT:
                 //    Juggernaugt(restEvent);
                 //    break;
@@ -262,6 +277,152 @@ public class RedeemHandler
                 Program.Logger.Info($"Spawning new Handler for {restEvent.RedeemType}");
                 Task.Run(() => {Run(restEvent.RedeemType!); });
             }
+    }
+
+    private void WhatIsThis(RestEvent restEvent)
+    {
+        var weapons = new List<WeaponItem>
+        {
+            new WeaponItem
+            {
+                ToolName = "Desert Eagle",
+                TopSight = Attachments._15xScope
+            },
+            new WeaponItem
+            {
+                ToolName = "SSG 69",
+                TopSight = Attachments.FYouSight
+            }
+        };
+        // set gadget to Pickaxe and clears previous Loadout 
+        Enqueue(restEvent.RedeemType, async () =>
+        {
+            if (Player != null)
+            {
+                var oldLoadOut = Player.CurrentLoadout;
+                
+                Random random = new Random();
+
+                // Get a random index
+                int randomIndex = random.Next(0, weapons.Count);
+
+                Server.BroadcasterList[restEvent.SteamId].Player?.SetPrimaryWeapon(weapons[randomIndex], 0, true);
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Message(
+                        $"{Server.BroadcasterList[restEvent.SteamId].Player?.Name} just went commando thanks {restEvent.Username}! Watch your Back!",
+                        2);
+                }
+                Program.Logger.Info(
+                    $"Melee Only {Server.BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
+                await Task.Delay(30000);
+            
+                UpdateLoadout(Player, oldLoadOut); // reset loadout to old one
+                Player?.Message("Have fun with your old Loadout", 2);
+
+            
+            }
+        });
+    }
+
+    private void MoonBoots(RestEvent restEvent)
+    {
+        Enqueue(restEvent.RedeemType, async () =>
+        {
+            if (Player != null)
+            {
+                var oldMulti = Player.Modifications.JumpHeightMultiplier;
+                Player.Modifications.JumpHeightMultiplier = 5;
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Message(
+                        $"{Player.Name} now has moon boots, thanks to {restEvent.Username}!",
+                        2);
+                }
+                Program.Logger.Info(
+                    $"MoonBoots {Server.BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
+                await Task.Delay(30000);
+                Player.Modifications.JumpHeightMultiplier = oldMulti;
+                Player.Message( $"Jumps are normal again",2);
+        
+            }
+            
+        });
+    }
+
+    private void SnailMovement(RestEvent restEvent)
+    {
+        Enqueue(restEvent.RedeemType, async () =>
+        {
+            if (Player != null)
+            {
+                var oldMulti = Player.Modifications.RunningSpeedMultiplier;
+                Player.Modifications.RunningSpeedMultiplier = 0.2f;
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Message(
+                        $"{Player.Name} now moves like a snail, thanks to {restEvent.Username}!",
+                        2);
+                }
+                Program.Logger.Info(
+                    $"SnailMovement {Server.BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
+                await Task.Delay(30000);
+                Player.Modifications.RunningSpeedMultiplier = oldMulti;
+                Player.Message( $"Movement is normal again",2);
+        
+            }
+            
+        });
+    }
+
+    private void SpeedyReload(RestEvent restEvent)
+    {
+        Enqueue(restEvent.RedeemType, async () =>
+        {
+            if (Player != null)
+            {
+                var oldMulti = Player.Modifications.ReloadSpeedMultiplier;
+                Player.Modifications.ReloadSpeedMultiplier = 10;
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Message(
+                        $"{Player.Name} now reloads FAST, thanks to {restEvent.Username}!",
+                        2);
+                }
+                Program.Logger.Info(
+                    $"SpeedyReload {Server.BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
+                await Task.Delay(30000);
+                Player.Modifications.ReloadSpeedMultiplier = oldMulti;
+                Player.Message( $"Reloads are normal again",2);
+        
+            }
+            
+        });
+    }
+
+    private void BabyJump(RestEvent restEvent)
+    {
+        Enqueue(restEvent.RedeemType, async () =>
+        {
+            if (Player != null)
+            {
+                var oldMulti = Player.Modifications.JumpHeightMultiplier;
+                Player.Modifications.JumpHeightMultiplier = 0.2f;
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Message(
+                        $"{Player.Name} now jumps like a baby, thanks to {restEvent.Username}!",
+                        2);
+                }
+                Program.Logger.Info(
+                    $"BabyJumps {Server.BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
+                await Task.Delay(30000);
+                Player.Modifications.JumpHeightMultiplier = oldMulti;
+                Player.Message( $"Jumps are normal again",2);
+        
+            }
+            
+        });
     }
 
     private void SlowBullets(RestEvent restEvent)

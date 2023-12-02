@@ -15,6 +15,11 @@ public enum RedeemTypes
     MEELEE, 
     ZOOMIES4ALL,
     DISABLEUI,
+    SPEEDYRELOAD,
+    SNAILMOVEMENT,
+    MOONBOOTS,
+    BABYJUMP,
+    WHATISTHIS,
     DEFAULT,
     RANDOM
 }
