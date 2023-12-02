@@ -9,7 +9,19 @@ public class Broadcaster
         ChaosEnabled = true;
         AcceptsRedeems = false;
         AcceptsVotes = true;
+        AcceptsFollows = false;
+        AcceptsSubs = false;
+        AcceptsCheers = false;
+        AcceptsRaids = false;
     }
+
+    public bool AcceptsRaids { get; set; }
+
+    public bool AcceptsCheers { get; set; }
+
+    public bool AcceptsSubs { get; set; }
+
+    public bool AcceptsFollows { get; set; }
 
     public bool AcceptsVotes { get; set; }
 

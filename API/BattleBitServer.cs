@@ -53,7 +53,11 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
             new TogglePlaylistCommand(this),
             new AddPermissionCommand(this),
             new ToggleRedeemsCommand(this),
-            new ToggleVoteCommand(this)
+            new ToggleVoteCommand(this),
+            new ToggleCheerCommand(this),
+            new ToggleFollowCommand(this),
+            new ToggleRaidCommand(this),
+            new ToggleSubCommand(this)
         };
         ServerModules = new List<ServerModule>
         {

@@ -118,21 +118,28 @@ public class RedeemHandler
         {
 
             case "Follow":
+                if(!Server.BroadcasterList[restEvent.SteamId].AcceptsFollows) return;
                 RandomizeRedeem(restEvent);
                 break;
             case "Gift":
+                if(!Server.BroadcasterList[restEvent.SteamId].AcceptsSubs) return;
+
                 for (int i = 0; i < restEvent.Tier; i++)
                 {
                     RandomizeRedeem(restEvent);
                 }
                 break;
             case "Sub":
+                if(!Server.BroadcasterList[restEvent.SteamId].AcceptsSubs) return;
+
                 for (int i = 0; i < restEvent.Tier; i++)
                 {
                     RandomizeRedeem(restEvent);
                 }
                 break;
             case "SubBomb":
+                if(!Server.BroadcasterList[restEvent.SteamId].AcceptsSubs) return;
+
                 for (int i = 0; i < restEvent.Amount; i++)
                 {
                     for (int j = 0; j < restEvent.Tier; j++)
@@ -142,12 +149,16 @@ public class RedeemHandler
                 }
                 break;
             case "Raid":
+                if(!Server.BroadcasterList[restEvent.SteamId].AcceptsRaids) return;
+
                 for (int i = 0; i < restEvent.Amount/10; i++)
                 {
                     RandomizeRedeem(restEvent);
                 };
                 break;
             case "Bits":
+                if(!Server.BroadcasterList[restEvent.SteamId].AcceptsCheers) return;
+
                 for (int i = 0; i < restEvent.Amount/10; i++)
                 {
                     RandomizeRedeem(restEvent);
