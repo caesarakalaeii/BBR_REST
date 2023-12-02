@@ -88,10 +88,13 @@ public class Vote
         var strings = new List<String>();
         int maxValue = Votes.Max();
         int maxIndex = Votes.IndexOf(maxValue);
+        Program.Logger.Debug($"max_val is: {maxValue}, max_index is {maxIndex}");
         for (int i = 0; i < Choices.Count; i++)
         {
             if (Votes[i] > 0)
             {
+                Program.Logger.Debug($"vote is {Votes[i]}, index is {i}");
+
                 if (i == maxIndex)
                 {
                     strings.Add($"{r.Bold(true)}{r.Color("Gold")}{i + 1}: {Choices[i]} ({Votes[i] / TotalVotes * 100}%){r.Color()}{r.Bold(false)}");
