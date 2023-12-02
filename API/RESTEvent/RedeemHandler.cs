@@ -685,9 +685,9 @@ public class RedeemHandler
         });
     }
     
-    private static void UpdateLoadout(BattleBitPlayer player, PlayerLoadout loadout)
+    private void UpdateLoadout(BattleBitPlayer player, PlayerLoadout loadout)
     {
-        if (Program.Server.CurrentGameMode.RefreshLoadout(player)) return; // id handler in gamemode, use that
+        if (Server.CurrentGameMode.RefreshLoadout(player)) return; // if handler in gamemode, use that
         
         player.SetLightGadget(loadout.LightGadgetName, loadout.LightGadgetExtra);
         player.SetThrowable(loadout.ThrowableName, loadout.ThrowableExtra);
