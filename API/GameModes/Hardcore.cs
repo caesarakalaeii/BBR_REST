@@ -1,4 +1,6 @@
-﻿namespace ChaosMode.API;
+﻿using ChaosMode.API.GameModes;
+
+namespace ChaosMode.API;
 
 public class Hardcore : GameMode
 {

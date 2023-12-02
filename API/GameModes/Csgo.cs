@@ -1,4 +1,5 @@
 ﻿using BattleBitAPI.Common;
+using ChaosMode.API.GameModes;
 
 namespace ChaosMode.API;
 

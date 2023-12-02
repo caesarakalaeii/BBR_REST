@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BattleBitAPI.Common;
 using BattleBitAPI.Server;
+using ChaosMode.API.GameModes;
 using ChaosMode.API.RESTEvent;
 using ChaosMode.BattleBitCommands;
 using ChaosMode.Modules;

@@ -1,4 +1,5 @@
 ﻿using BattleBitAPI.Common;
+using ChaosMode.API.GameModes;
 
 namespace ChaosMode.API;
 
@@ -16,5 +17,12 @@ public class MeleeOnly : GameMode
         player.Modifications.FallDamageMultiplier = 0f;
         player.Modifications.JumpHeightMultiplier = 1.5f;
         return base.OnPlayerSpawning(player, request);
+    }
+
+    public override bool RefreshLoadout(BattleBitPlayer player)
+    {
+        player.SetLightGadget("Pickaxe", 0, true);
+
+        return true;
     }
 }

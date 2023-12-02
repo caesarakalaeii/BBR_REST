@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using BattleBitAPI.Common;
 
-namespace ChaosMode.API;
+namespace ChaosMode.API.GameModes;
 
 public class GameMode
 {
@@ -94,5 +94,10 @@ public class GameMode
             
         };
         return re;
+    }
+
+    public virtual bool RefreshLoadout(BattleBitPlayer player)
+    {
+        return false;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using BattleBitAPI.Common;
 
-namespace ChaosMode.API;
+namespace ChaosMode.API.GameModes;
 
 public class GunGame : GameMode
 {
@@ -110,5 +110,11 @@ public class GunGame : GameMode
             _data.SetLevel(player, 0);
             player.Kill();
         }
+    }
+
+    public override bool RefreshLoadout(BattleBitPlayer player)
+    {
+        UpdateWeapon(player);
+        return true;
     }
 }

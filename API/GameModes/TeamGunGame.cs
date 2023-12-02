@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BattleBitAPI.Common;
+using ChaosMode.API.GameModes;
 
 namespace ChaosMode.API;
 
@@ -121,6 +122,16 @@ public class TeamGunGame : GameMode
         request.Loadout.FirstAid = null;
         request.Loadout.HeavyGadget = new Gadget("Sledge Hammer");
         return base.OnPlayerSpawning(player, request);
+    }
+
+    public override bool RefreshLoadout(BattleBitPlayer player)
+    {
+        var level = 0;
+        if (player.Team == Team.TeamA) level = LevelA;
+        else if (player.Team == Team.TeamB) level = LevelB;
+        
+        player.SetPrimaryWeapon(ProgressionList[level], 3);
+        return true;
     }
 
     public override BattleBitPlayer OnPlayerSpawned(BattleBitPlayer player)
