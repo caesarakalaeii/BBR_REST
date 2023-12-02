@@ -108,7 +108,7 @@ public class RestEvent
             case "bleed":
                 return RedeemTypes.BLEED;
             case "turntables":
-                return RedeemTypes.TRUNTABLES;
+                return RedeemTypes.TURNTABLES;
             case "melee":
                 return RedeemTypes.MEELEE;
             case "random":

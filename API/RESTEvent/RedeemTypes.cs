@@ -11,7 +11,7 @@ public enum RedeemTypes
     GLASS,
     FREEZE,
     BLEED,
-    TRUNTABLES,
+    TURNTABLES,
     MEELEE, 
     ZOOMIES4ALL,
     DISABLEUI,

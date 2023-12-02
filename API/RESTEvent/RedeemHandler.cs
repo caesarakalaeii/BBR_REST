@@ -227,7 +227,7 @@ public class RedeemHandler
                 case RedeemTypes.BLEED:
                     Bleed(restEvent);
                     break;
-                case RedeemTypes.TRUNTABLES:
+                case RedeemTypes.TURNTABLES:
                     TurnTables(restEvent);
                     break;
                 case RedeemTypes.MEELEE:
@@ -687,12 +687,12 @@ public class RedeemHandler
     
     private static void UpdateLoadout(BattleBitPlayer player, PlayerLoadout loadout)
     {
-        player.SetLightGadget(loadout.LightGadgetName, loadout.LightGadgetExtra, true);
+        player.SetPrimaryWeapon(loadout.PrimaryWeapon, loadout.PrimaryExtraMagazines);
+        player.SetSecondaryWeapon(loadout.SecondaryWeapon, loadout.SecondaryExtraMagazines);
+        player.SetLightGadget(loadout.LightGadgetName, loadout.LightGadgetExtra);
         player.SetThrowable(loadout.ThrowableName, loadout.ThrowableExtra);
         player.SetHeavyGadget(loadout.HeavyGadgetName, loadout.HeavyGadgetExtra);
         player.SetFirstAidGadget(loadout.FirstAidName, loadout.FirstAidExtra);
-        player.SetSecondaryWeapon(loadout.SecondaryWeapon, loadout.SecondaryExtraMagazines);
-        player.SetPrimaryWeapon(loadout.PrimaryWeapon, loadout.PrimaryExtraMagazines);
     }
 
     private static void UpdateWearings(BattleBitPlayer player, PlayerWearings wearings)
