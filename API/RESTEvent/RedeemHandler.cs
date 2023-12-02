@@ -105,6 +105,7 @@ public class RedeemHandler
                 if (Server.BroadcasterList.Keys.Contains(p.SteamID))
                 {
                     Server.BroadcasterList[p.SteamID].Player = p;
+                    Server.RedeemHandlers[p.SteamID].Player = p;
                 }
             }
 
@@ -118,6 +119,12 @@ public class RedeemHandler
         if (player != Server.BroadcasterList[restEvent.SteamId].Player)
         {
             Server.BroadcasterList[restEvent.SteamId].Player = player;
+
+        }
+        if (player != Server.RedeemHandlers[restEvent.SteamId].Player)
+        {
+            Server.RedeemHandlers[restEvent.SteamId].Player = player;
+
         }
         switch (restEvent.EventType)
         {

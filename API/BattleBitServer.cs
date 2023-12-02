@@ -372,6 +372,15 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
     {
         foreach (var @module in ServerModules)
             await @module.OnRoundEnded();
+        foreach(var caster in BroadcasterList.Values)
+        {
+            caster.Player = null;
+        }
+
+        foreach (var handler in RedeemHandlers.Values)
+        {
+            handler.Player = null;
+        }
     }
     
     public override async Task OnSessionChanged(long oldSessionID, long newSessionID)
@@ -381,6 +390,7 @@ public class BattleBitServer: GameServer<BattleBitPlayer>
             if (BroadcasterList.Keys.Contains(player.SteamID))
             {
                 BroadcasterList[player.SteamID].Player = player;
+                RedeemHandlers[player.SteamID].Player = player;
             }
         }
         
