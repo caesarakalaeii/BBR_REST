@@ -114,6 +114,11 @@ public class RedeemHandler
                 return;
             }
         }
+        player = Server.AllPlayers.FirstOrDefault(p => p.SteamID == restEvent.SteamId);
+        if (player != Server.BroadcasterList[restEvent.SteamId].Player)
+        {
+            Server.BroadcasterList[restEvent.SteamId].Player = player;
+        }
         switch (restEvent.EventType)
         {
 
