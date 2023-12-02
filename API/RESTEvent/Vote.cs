@@ -86,10 +86,16 @@ public class Vote
     public List<string> GenerateChoiceStrings()
     {
         var strings = new List<String>();
+        int maxValue = Votes.Max();
+        int maxIndex = Votes.IndexOf(maxValue);
         for (int i = 0; i < Choices.Count; i++)
         {
             if (Votes[i] > 0)
             {
+                if (i == maxIndex)
+                {
+                    strings.Add($"{r.Bold(true)}{r.Color("Gold")}{i + 1}: {Choices[i]} ({Votes[i] / TotalVotes * 100}%){r.Color()}{r.Bold(false)}");
+                }
                 strings.Add($"{i+1}: {Choices[i]} ({Votes[i]/TotalVotes*100}%)");
             }
             else strings.Add($"{i+1}: {Choices[i]} ({0}%)");

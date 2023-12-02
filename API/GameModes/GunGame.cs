@@ -81,8 +81,10 @@ public class GunGame : GameMode
     public override OnPlayerKillArguments<BattleBitPlayer> OnAPlayerDownedAnotherPlayer(
         OnPlayerKillArguments<BattleBitPlayer> onPlayerKillArguments)
     {
+        
         var killer = onPlayerKillArguments.Killer;
         var victim = onPlayerKillArguments.Victim;
+        if (killer == victim) return base.OnAPlayerDownedAnotherPlayer(onPlayerKillArguments);
         _data.IncLevel(killer);
         if (_data.GetLevel(killer) == GetGameLenght()) R.AnnounceShort($"{killer.Name} only needs 1 more Kill");
         if (_data.GetLevel(killer) > GetGameLenght())

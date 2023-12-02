@@ -1,4 +1,4 @@
-﻿namespace ChaosMode.API;
+﻿namespace ChaosMode.API.RESTEvent;
 
 public enum RedeemTypes
 {
@@ -13,6 +13,8 @@ public enum RedeemTypes
     BLEED,
     TRUNTABLES,
     MEELEE, 
+    ZOOMIES4ALL,
+    DISABLEUI,
     DEFAULT,
     RANDOM
 }

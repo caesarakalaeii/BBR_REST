@@ -233,6 +233,18 @@ public class RedeemHandler
                 case RedeemTypes.MEELEE:
                     Melee(restEvent);
                     break;
+                case RedeemTypes.DISABLEUI:
+                    DisableUI(restEvent);
+                    break;
+                case RedeemTypes.ZOOMIES4ALL:
+                    Zoomies4All(restEvent);
+                    break;
+                //case RedeemTypes.JUGGERNAUGT:
+                //    Juggernaugt(restEvent);
+                //    break;
+                //case RedeemTypes.SLOWBULLETS:
+                //    SlowBullets(restEvent);
+                //    break;
                 
                     
                 
@@ -250,6 +262,146 @@ public class RedeemHandler
                 Program.Logger.Info($"Spawning new Handler for {restEvent.RedeemType}");
                 Task.Run(() => {Run(restEvent.RedeemType!); });
             }
+    }
+
+    private void SlowBullets(RestEvent restEvent)
+    {
+        Enqueue(restEvent.RedeemType, async () =>
+        {
+            if (Player != null)
+            {
+                
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Message(
+                        $"Time just went weird thanks to {restEvent.Username}!",
+                        2);
+                }
+                Program.Logger.Info(
+                    $"SlowBullets {Server.BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
+                await Task.Delay(30000);
+        
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Message(
+                        $"Bullets are normal again",
+                        2);
+                }
+                Player?.Message("Have fun with your old Loadout", 2);
+
+        
+            }
+            
+        });
+    }
+
+    private void Juggernaugt(RestEvent restEvent)
+    {
+        
+        Enqueue(restEvent.RedeemType, async () =>
+        {
+            if (Player != null)
+            {
+                var oldLoadOut = Player.CurrentLoadout;
+
+
+
+
+                var weapon = new WeaponItem
+                {
+                    ToolName = "M249",
+                    
+                };
+                Server.BroadcasterList[restEvent.SteamId].Player?.SetPrimaryWeapon(weapon, 10, true);
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Message(
+                        $"{Server.BroadcasterList[restEvent.SteamId].Player?.Name} just went commando thanks {restEvent.Username}! Watch your Back!",
+                        2);
+                }
+                Program.Logger.Info(
+                    $"Juggernaugt {Server.BroadcasterList[restEvent.SteamId].Player?.Name}({restEvent.SteamId})");
+                await Task.Delay(30000);
+        
+                UpdateLoadout(Player, oldLoadOut); // reset loadout to old one
+                Player?.Message("Have fun with your old Loadout", 2);
+
+        
+            }
+            
+        });
+
+        
+        
+    }
+
+    private void Zoomies4All(RestEvent restEvent)
+    {
+        if (Player != null)
+        {
+            Enqueue(restEvent.RedeemType, async () =>
+            {
+                var oldSpeed = Player.Modifications.RunningSpeedMultiplier;
+
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Modifications.RunningSpeedMultiplier = oldSpeed * 3;
+                    p.Message(
+                        $"Everyone has the zoomies thanks to {restEvent.Username}!", 2);
+                }
+
+                Program.Logger.Info(
+                    $"Zoomies for Everyone({restEvent.SteamId})");
+                await Task.Delay(15000);
+                if(Player == null)return;
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Modifications.RunningSpeedMultiplier = oldSpeed;
+                    p.Message("Zoomies have Ended", 2);
+                }
+                
+            });
+
+        }
+    }
+
+    private void DisableUI(RestEvent restEvent)
+    {
+        Enqueue(restEvent.RedeemType, async () =>
+        {
+            if (Player != null)
+            {
+                var oldHitMarkersEnabled = Player.Modifications.HitMarkersEnabled;
+                Player.Modifications.HitMarkersEnabled = false;
+                
+                var oldFriendlyHUDEnabled = Player.Modifications.FriendlyHUDEnabled;
+                Player.Modifications.FriendlyHUDEnabled = false;
+                
+                var oldPointLogHudEnabled = Player.Modifications.PointLogHudEnabled;
+                Player.Modifications.PointLogHudEnabled = false;
+                
+                foreach (var p in Server.AllPlayers)
+                {
+                    p.Message(
+                        $"{Player.Name} just lost all info thanks to {restEvent.Username}!",
+                        2);
+                }
+                Program.Logger.Info(
+                    $"Disable UI {Player.Name}({restEvent.SteamId})");
+                await Task.Delay(30000);
+                
+                Player.Modifications.HitMarkersEnabled = oldHitMarkersEnabled;
+                Player.Modifications.FriendlyHUDEnabled = oldFriendlyHUDEnabled;
+                Player.Modifications.PointLogHudEnabled = oldPointLogHudEnabled;
+
+
+                
+                Player?.Message("Have fun with your HUD", 2);
+
+            
+            }
+        });
+        
     }
 
     public static RedeemTypes GenerateRandomRedeem()
@@ -541,6 +693,11 @@ public class RedeemHandler
         player.SetFirstAidGadget(loadout.FirstAidName, loadout.FirstAidExtra);
         player.SetSecondaryWeapon(loadout.SecondaryWeapon, loadout.SecondaryExtraMagazines);
         player.SetPrimaryWeapon(loadout.PrimaryWeapon, loadout.PrimaryExtraMagazines);
+    }
+
+    private static void UpdateWearings(BattleBitPlayer player, PlayerWearings wearings)
+    {
+        ;
     }
 }
 
